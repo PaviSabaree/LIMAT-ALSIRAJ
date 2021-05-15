@@ -36,7 +36,7 @@ class App {
     }
     dbConnection() {
         // Connecting to the database
-        mongodb.connect(constant_enum_1.DBConnection.dbConnection, { useNewUrlParser: true, useUnifiedTopology: true }, {}).then(() => {
+        mongodb.connect(constant_enum_1.DBConnection.dbConnection, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
             console.log("Successfully connected to the database !!");
         }).catch((err) => {
             console.log('Could not connect to the database. Exiting now...', err);

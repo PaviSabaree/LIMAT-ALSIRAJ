@@ -46,8 +46,7 @@ class App {
 
     public dbConnection(){
         // Connecting to the database
-        mongodb.connect(DBConnection.dbConnection, {useNewUrlParser: true, useUnifiedTopology: true},{
-        }).then(() => {
+        mongodb.connect(DBConnection.dbConnection, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
         console.log("Successfully connected to the database !!");
         }).catch((err: any) => {
         console.log('Could not connect to the database. Exiting now...', err);

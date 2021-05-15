@@ -9,7 +9,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const user_schema_1 = require("../schema/user.schema");
 class Service {
+    /* function to create new User */
+    signUp(userInformation) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = new user_schema_1.UserSchema({
+                    userName: userInformation.userName,
+                    firstName: userInformation.firstName,
+                    lastName: userInformation.lastName,
+                    password: userInformation.password,
+                    emailId: userInformation.emailId,
+                    phoneNumber: userInformation.phoneNumber,
+                    appUser: userInformation.appUser,
+                    userType: userInformation.userType,
+                    documentUrl: userInformation.documentUrl
+                });
+                yield user.save().then((data) => {
+                    return data;
+                });
+            }
+            catch (error) {
+                console.error('Exception occured in signUp', error);
+                throw error;
+            }
+        });
+    }
     getUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             return [
