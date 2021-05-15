@@ -1,2 +1,13 @@
-# alsiraj-dev-2.0
-Alsiraj Web
+# Express TypeScript Test
+
+To run in development mode
+
+```bash
+npm run dev
+```
+
+To build
+
+```bash
+npm run build
+```

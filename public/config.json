@@ -1,0 +1,7 @@
+{
+  "accessKeyId": "AKIA5SXMW6QGBDLCOZOT",
+  "secretAccessKey": "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",
+  "region": "ap-south-1",
+  "snsTopicArn": "arn:aws:sns:ap-south-1:933578077196:verizon"
+}
+
