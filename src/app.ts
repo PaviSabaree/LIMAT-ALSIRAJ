@@ -38,7 +38,7 @@ class App {
         this.app.set('view engine', 'pug')
     }
 
-    public listen() {
+    public listening() {
         this.app.listen(this.port, () => {
             console.log(`App listening on the http://localhost:${this.port}`)
         })
@@ -48,6 +48,7 @@ class App {
         // Connecting to the database
         mongodb.connect(DBConnection.dbConnection, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
         console.log("Successfully connected to the database !!");
+        this.listening();
         }).catch((err: any) => {
         console.log('Could not connect to the database. Exiting now...', err);
         process.exit();

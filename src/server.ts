@@ -19,7 +19,4 @@ const app = new App({
     ],
 })
 
-app.dbConnection()
-
-app.listen()
-
+app.dbConnection();
