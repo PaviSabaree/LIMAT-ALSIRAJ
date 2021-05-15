@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constant_enum_1 = require("./config/constant.enum");
 const express = require("express");
-const mongodb = require("mongodb");
+const mongodb = require("mongoose");
 class App {
     constructor(appInit) {
         this.app = express();

@@ -26,9 +26,17 @@ class Service {
                     userType: userInformation.userType,
                     documentUrl: userInformation.documentUrl
                 });
-                yield user.save().then((data) => {
-                    return data;
+                let result = '';
+                user.save((error, data) => {
+                    if (error) {
+                        console.log(error);
+                        throw error;
+                    }
+                    else {
+                        result = data;
+                    }
                 });
+                return result;
             }
             catch (error) {
                 console.error('Exception occured in signUp', error);

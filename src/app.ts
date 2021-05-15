@@ -1,6 +1,6 @@
 import { DBConnection } from './config/constant.enum'
 import * as express from 'express'
-import * as mongodb from 'mongodb'
+import * as mongodb from 'mongoose'
 
 class App {
     public app: express.Application

@@ -16,6 +16,8 @@ class HomeRoute  {
     private getUsers = (req: express.Request, res: express.Response) => {
 
         const result = this.service.getUsers();
+
+        console.log(result)
         
         res.send( result );
     }
@@ -23,9 +25,11 @@ class HomeRoute  {
     private _signup = (req: express.Request, res: express.Response) => {
 
         try {
-            const {userName, firstName, lastName, password, emailId, phoneNumber, appUser, userType, documentUrl}= req.body
+            const {userName, firstName, lastName, password, emailId, phoneNumber,
+                 appUser, userType, documentUrl}= req.body
 
-            const result = this.service.signUp({userName, firstName, lastName, password, emailId, phoneNumber, appUser, userType, documentUrl});
+            const result = this.service.signUp({userName, firstName, lastName, 
+                password, emailId, phoneNumber, appUser, userType, documentUrl});
             
             res.send( result );  
         } catch (error) {
