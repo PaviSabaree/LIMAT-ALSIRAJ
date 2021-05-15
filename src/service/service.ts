@@ -4,7 +4,7 @@ import { UserSchema } from "../schema/user.schema";
 
 class Service {
   /* function to create new User */
-  public async signUp(userInformation: IUserInformation): Promise<any> {
+  public async signUp(userInformation: IUserInformation,next): Promise<any> {
     try {
       const user = new UserSchema({
         userName: userInformation.userName,
@@ -18,22 +18,11 @@ class Service {
         documentUrl: userInformation.documentUrl,
       });
 
-      let result = "";
+      return await user.save();
+    } catch (err) {
+      console.log("Exception occured in signUp", err);
 
-      user.save((error: any, data: any) => {
-        if (error) {
-          console.log(error);
-          throw error;
-        } else {
-          result = data;
-        }
-      });
-
-      return result;
-    } catch (error) {
-      console.error("Exception occured in signUp", error);
-
-      throw error;
+      next (err);
     }
   }
 

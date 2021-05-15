@@ -13,7 +13,7 @@ class HomeRoute  {
 
     }
     
-    private getUsers = (req: express.Request, res: express.Response) => {
+    private getUsers = (req: express.Request, res: express.Response,next) => {
 
         const result = this.service.getUsers();
 
@@ -22,23 +22,27 @@ class HomeRoute  {
         res.send( result );
     }
 
-    private _signup = (req: express.Request, res: express.Response) => {
+    private  _signup = async (req: express.Request, res: express.Response,next) => {
 
         try {
             const {userName, firstName, lastName, password, emailId, phoneNumber,
                  appUser, userType, documentUrl}= req.body
 
-            const result = this.service.signUp({userName, firstName, lastName, 
-                password, emailId, phoneNumber, appUser, userType, documentUrl});
-            
-            res.send( result );  
-        } catch (error) {
-            
-            res.status(400).send({
-                message: error
-             });
-        }
+            const result = await this.service.signUp({userName, firstName, lastName, 
+                password, emailId, phoneNumber, appUser, userType, documentUrl},next);               
 
+            if(!result && result === undefined){
+                throw new Error('unable to save');
+            }
+            
+            res.json({ data :  result });  
+        } catch (err) {
+            console.log("Error occured in _signup",err);
+            
+            res.status(400).json({
+                message: err.toString()
+            });
+        }
        
     }
 }
