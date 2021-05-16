@@ -9,6 +9,7 @@ class HomeRoute  {
     constructor() {
         this.router.get('/', this.getUsers);
         this.router.post('/masters/any/users/add', this._signup);
+        this.router.post('/auth/signin', this._signIn);
         this.service = new Service();
 
     }
@@ -43,6 +44,33 @@ class HomeRoute  {
 
                 res.status(400).json({
                     message: err
+                });  
+           
+        }
+       
+    }
+
+    private  _signIn = async (req: express.Request, res: express.Response) => {
+
+        try {
+            const { password, emailId, phoneNumber,
+                 }= req.body
+
+            const result = await this.service.signIn({
+                password, emailId});   
+
+
+            if(!result && result === undefined){
+                throw new Error('unable to get details');
+            }
+            
+            res.json({ data :  result });  
+        } catch (err) {
+ 
+            console.log("Error occured in _signIn",err);
+
+                res.status(400).json({
+                    message: err.toString()
                 });  
            
         }
