@@ -1,6 +1,6 @@
 import { IUserInformation } from "interfaces/IUser.interface";
 import * as jwt from "jsonwebtoken";
-import { UserSchema } from "schema/user.schema";
+import { UserSchema } from "../../schema/user.schema";
 
 class AuthService {
     
@@ -71,18 +71,20 @@ class AuthService {
 
     public async getAccessToken(token: string): Promise<any> {
         try {
-            let accessToken = '';
+            let accessToken: string = '';
 
             if (token == null && !this.refreshTokens.includes(token)){
                 throw new Error('not a valid token');
             } 
  
-            jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
               if (err){
                 throw err;
               } 
+
+              console.log("eee",user);
             
-              accessToken = this._generateAccessToken({ name: user.name })
+              accessToken = await this._generateAccessToken({ name: user["name"] });
             })
 
             return accessToken;
@@ -93,7 +95,9 @@ class AuthService {
         }
     }
 
-  private async _generateAccessToken(user): Promise<string> {
+  private async _generateAccessToken(user) {
+    console.log('qq', user);
+    
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' })
   }
 

@@ -1,25 +1,25 @@
-import * as express from 'express'
-import authenticateToken from 'middleware/authentication';
+import { Request , Response, NextFunction, Router } from 'express';
+import authenticateToken from '../../middleware/authentication';
 import Service from '../../service/service';
 
 class HomeRoute  {
 
-    protected router = express.Router();
+    protected router = Router();
     protected service:Service; 
     
     constructor() {
-        this.router.get('/', authenticateToken, this.getUsers);
+        this.router.get('/', [authenticateToken], this.getUsers);
         this.service = new Service();
 
     }
     
-    private getUsers = (req: express.Request, res: express.Response,next) => {
+    private getUsers = (req: Request, res: Response,next: NextFunction) => {
 
         const result = this.service.getUsers();
 
         console.log(result)
         
-        res.send( result );
+        res.json(result);  
     }
 }
 
