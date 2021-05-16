@@ -1,5 +1,4 @@
 import * as express from 'express'
-import authenticateToken from '../../middleware/authentication';
 import AuthService from '../../service/auth/auth.service';
 
 class AuthRoute  {
@@ -8,7 +7,7 @@ class AuthRoute  {
     protected authService:AuthService; 
     
     constructor() {
-        this.router.post('/masters/any/users/add', [authenticateToken], this._signup);
+        this.router.post('/masters/any/users/add', this._signup);
         this.router.post('/auth/signin', this._signIn);
         this.router.post('/auth/getAuthToken', this._getAuthToken);
         this.authService = new AuthService();
@@ -45,11 +44,11 @@ class AuthRoute  {
     private  _signIn = async (req: express.Request, res: express.Response) => {
 
         try {
-            const { password, emailId, phoneNumber,
+            const { password, emailId, phoneNumber, userName
                  }= req.body
 
             const result = await this.authService.signIn({
-                password, emailId});   
+                password, emailId, userName});   
 
 
             if(!result && result === undefined){

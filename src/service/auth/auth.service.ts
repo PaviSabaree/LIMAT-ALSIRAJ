@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 import { IUserInformation } from "interfaces/IUser.interface";
 import * as jwt from "jsonwebtoken";
 import { UserSchema } from "../../schema/user.schema";
