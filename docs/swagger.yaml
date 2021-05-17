@@ -1,0 +1,62 @@
+info:
+  title: Alsiraj website
+  version: 1.0.0
+  description: __*This describes services details of Alsiraj*__
+  termsOfService: ''
+  contact:
+    email: 'suriyathangaraman@gmail.com'
+  license:
+    name: ''
+    url: ''
+basePath: '/'
+swagger: '2.0'
+responses: {}
+parameters: {}
+tags:
+  - name: 'Login'
+    description: __Rest API's to List and Details about login and SignUp information.__
+schemes:
+  - http
+paths:
+  /login:
+    post:
+      tags:
+        - 'Login'
+      summary: To get RA list
+      operationId: _postLogin
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                type: 'array'
+                items:
+                  $ref: '#/definitions/RAListResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: RA List Failed
+      produces:
+        - 'application/json'
+
+definitions:
+  RAListResponse:
+    type: object
+    properties:
+      ra_id:
+        type: number
+      ra_nickname:
+        type: string
+      created_profiles:
+        type: number
+      profile_types:
+        type: string
+      assigned_ra_operators:
+        type: number
+      associated_policies:
+        type: number
+      status:
+        type: string
+ 
