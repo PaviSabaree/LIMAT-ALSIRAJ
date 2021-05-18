@@ -5,7 +5,7 @@ const authenticateToken = (req: Request, resp: Response, next) => {
     
    console.log('came to auth')
     const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
+    const token = authHeader
     if (token == null) return resp.sendStatus(401)
 
     console.log('token ==', token)

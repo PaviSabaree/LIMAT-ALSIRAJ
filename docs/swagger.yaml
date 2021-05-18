@@ -1,29 +1,50 @@
 info:
-  title: Alsiraj website
+  title: ALSIRAJ NODEJS SWAGGER  DOCUMENTATION
   version: 1.0.0
-  description: __*This describes services details of Alsiraj*__
-  termsOfService: ''
+  description: __*This describes services details of ALSIRAJ*__
+  termsOfService: 'https://alsiraj-website/terms-conditions/overview'
   contact:
     email: 'suriyathangaraman@gmail.com'
   license:
     name: ''
-    url: ''
+    url: 'https://www.alsiraj.com'
 basePath: '/'
 swagger: '2.0'
 responses: {}
 parameters: {}
 tags:
   - name: 'Login'
-    description: __Rest API's to List and Details about login and SignUp information.__
+    description: __Rest API's to create new user or admin.__
+  - name: 'SignUp'
+    description: __Rest API's to get login the application.__
+  - name: 'RefreshToken'
+    description: __Rest API's to get new Access Token.__
+  - name: 'User Authentication'
+    description: __Rest API's sample to Authenticate user details.__
 schemes:
   - http
+  - https
+securityDefinitions:
+    Bearer:
+        type: apiKey
+        description: "Value: Bearer "
+        name: Authorization
+        in: header
+security:
+  - Bearer: []          
 paths:
-  /login:
+  /masters/any/users/add:
     post:
       tags:
         - 'Login'
-      summary: To get RA list
-      operationId: _postLogin
+      summary: Create new user/admin
+      operationId: _signup
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/SignUpUserInputInfo'
       responses:
         '200':
           description: OK
@@ -31,32 +52,205 @@ paths:
             type: 'object'
             properties:
               data:
-                type: 'array'
-                items:
-                  $ref: '#/definitions/RAListResponse'
+                $ref: '#/definitions/SignUpDataValueResponse'
         '400':
           description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
         '500':
-          description: RA List Failed
+          description: Create new user/admin Failed
+      consumes:
+        - 'application/json'
       produces:
         - 'application/json'
+  /auth/signin:
+    post:
+      tags:
+        - 'SignUp'
+      summary: To login the application.__
+      operationId: _signIn
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/LoginUserInputInfo'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/LoginResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Login Failed
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /auth/getAuthToken:
+    post:
+      tags:
+        - 'RefreshToken'
+      summary: To get  new AccessToken using refresh token.__
+      operationId: _getAuthToken
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/GetRefreshTokenInfo'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              accessToken:
+                type: string
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: new Access Token Request Failed
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /test:
+    get:
+      tags:
+        - 'User Authentication'
+      summary: To validate the user token.__
+      operationId: getUsers
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              accessToken:
+                type: string
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: new Access Token Request Failed
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'                    
 
 definitions:
-  RAListResponse:
+  SignUpUserInputInfo:
     type: object
     properties:
-      ra_id:
-        type: number
-      ra_nickname:
+      userName:
         type: string
-      created_profiles:
-        type: number
-      profile_types:
+      firstName:
         type: string
-      assigned_ra_operators:
-        type: number
-      associated_policies:
-        type: number
-      status:
+      lastName:
         type: string
+      password:
+        type: string
+      emailId:
+        type: string
+      phoneNumber:
+        type: number
+      appUser:
+        type: string
+      userType:
+        type: string
+      documentUrl:
+        type: string
+  GetRefreshTokenInfo:
+    type: object
+    properties:
+      token:
+        type: string      
+  LoginUserInputInfo:
+    type: object
+    properties:
+      password:
+        type: string
+      emailId:
+        type: string
+  LoginResponse:
+    type: object
+    properties:
+      status: 
+        type: boolean
+      message:
+        type: string
+      userType:
+        type: string
+      data:
+        type: object
+        properties:
+          status:
+            type: boolean
+          token:
+            type: string
+          refreshtoken:
+            type: string      
+      userDbInfo:
+         type: object
+         properties:
+          _id:
+            type: string
+          userName:
+            type: string
+          firstName:
+            type: string
+          lastName:
+            type: string
+          password:
+            type: string
+          emailId:
+            type: string 
+          phoneNumber:
+            type: string
+          appUser:
+            type: string
+          userType:
+            type: string
+          documentUrl:
+            type: string
+  SignUpDataValueResponse:
+    type: object
+    properties:
+      _id:
+        type: string
+      userName:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+      emailId:
+        type: string 
+      phoneNumber:
+        type: string
+      appUser:
+        type: string
+      userType:
+        type: string
+      documentUrl:
+        type: string                                           
+  ErrorResponse:
+    type: object
+    properties:
+      httpErrorMessage:
+        type: 'string'
+      message:
+        type: 'string'              
  

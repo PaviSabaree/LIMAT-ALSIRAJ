@@ -54,7 +54,7 @@ class AuthService {
               refreshtoken,
             },
             userType: userDbInfo[0]['userType'],
-            userDbInfo
+            userDbInfo:userDbInfo[0]
           }
         }else{
 
