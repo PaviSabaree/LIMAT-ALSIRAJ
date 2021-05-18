@@ -1,7 +1,7 @@
-import { IUserInformation } from "interfaces/IUser.interface";
-import { IGetUsers } from "models/i-get-user";
 import { UserSchema } from "../schema/user.schema";
 import * as jwt from "jsonwebtoken";
+import { IUserInformation } from "../interfaces/IUser.interface";
+import { IGetUsers } from "../models/i-get-user";
 
 class Service {
   /* function to create new User */

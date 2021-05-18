@@ -44,11 +44,12 @@ class AuthRoute  {
     private  _signIn = async (req: express.Request, res: express.Response) => {
 
         try {
-            const { password, emailId, phoneNumber, userName
+
+            const { emailId, password
                  }= req.body
 
             const result = await this.authService.signIn({
-                password, emailId, userName});   
+                password, emailId});   
 
 
             if(!result && result === undefined){
