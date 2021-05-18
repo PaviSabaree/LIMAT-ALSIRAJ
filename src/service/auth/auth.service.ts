@@ -36,9 +36,7 @@ class AuthService {
           password: userInformation.password,
         }
 
-        const userDbInfo = await UserSchema.find({'emailId': userInformation.emailId}).exec()
-
-        user.userName = userDbInfo[0]['userName'];
+        const userDbInfo = await UserSchema.find({'emailId': userInformation.emailId}).exec();
 
         if(userDbInfo.length){
 
@@ -80,15 +78,15 @@ class AuthService {
             throw new Error('not a valid token');
         } 
 
-        jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, async (err, user ) => {
+        jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, async (err, user : ILoginInfo) => {
           if (err){
             
             reject(err)
           } 
     
-          accessToken = await this._generateAccessToken({
-            emailid : user['emailId'],
-            password: user['password']
+          accessToken = await this._generateAccessToken( {
+            emailId: user.emailId,
+            password:user.password
           })
 
           resolve(accessToken)

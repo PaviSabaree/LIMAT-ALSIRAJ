@@ -1,5 +1,4 @@
 import * as express from 'express'
-import authenticateToken from '../../middleware/authentication';
 import AuthService from '../../service/auth/auth.service';
 
 class AuthRoute  {
@@ -45,7 +44,7 @@ class AuthRoute  {
     private  _signIn = async (req: express.Request, res: express.Response) => {
 
         try {
-            console.log('came here')
+
             const { emailId, password
                  }= req.body
 
