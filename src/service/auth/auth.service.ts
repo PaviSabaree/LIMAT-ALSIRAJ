@@ -1,7 +1,6 @@
-import { IUserInformation } from "interfaces/IUser.interface";
+import { ILoginInfo, IUserInformation } from "interfaces/IUser.interface";
 import * as jwt from "jsonwebtoken";
-import { UserSchema } from "schema/user.schema";
-
+import { UserSchema } from "../../schema/user.schema"
 class AuthService {
     
     protected refreshTokens = [];
@@ -29,20 +28,22 @@ class AuthService {
   }
 
     /* function to Login and get accessToken and RefreshToken */
-    public async signIn(userInformation: any): Promise<any> {
+    public async signIn(userInformation: ILoginInfo): Promise<any> {
       try {
        
-        const user = {
-          userName: userInformation.userName,
-          emailId: userInformation.emailId
+        const user : ILoginInfo = {
+          emailId: userInformation.emailId,
+          password: userInformation.password,
         }
 
         const userDbInfo = await UserSchema.find({'emailId': userInformation.emailId}).exec()
 
+        user.userName = userDbInfo[0]['userName'];
+
         if(userDbInfo.length){
 
-          const token = await this._generateRefreshToken(user);
-          const refreshtoken = await this._generateAccessToken(user);
+          const token = await this._generateAccessToken(user);
+          const refreshtoken = await this._generateRefreshToken(user);
 
           this.refreshTokens.push(refreshtoken);
   
@@ -70,27 +71,29 @@ class AuthService {
     }
 
     public async getAccessToken(token: string): Promise<any> {
-        try {
-            let accessToken = '';
 
-            if (token == null && !this.refreshTokens.includes(token)){
-                throw new Error('not a valid token');
-            } 
- 
-            jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-              if (err){
-                throw err;
-              } 
+      return new Promise((resolve, reject)=> { 
+
+        let accessToken = '';
+
+        if (token == null && !this.refreshTokens.includes(token)){
+            throw new Error('not a valid token');
+        } 
+
+        jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, async (err, user ) => {
+          if (err){
             
-              accessToken = this._generateAccessToken({ name: user.name })
-            })
+            reject(err)
+          } 
+    
+          accessToken = await this._generateAccessToken({
+            emailid : user['emailId'],
+            password: user['password']
+          })
 
-            return accessToken;
-        }catch(err){
-            console.log("Exception occured in getAccessToken", err);
-  
-            throw err;
-        }
+          resolve(accessToken)
+        })
+      })
     }
 
   private async _generateAccessToken(user): Promise<string> {

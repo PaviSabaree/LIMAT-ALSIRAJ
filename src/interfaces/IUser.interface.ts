@@ -11,3 +11,10 @@ export interface IUserInformation{
         documentUrl: string
     
 }
+
+export interface ILoginInfo{
+        emailId: string,
+        password: string,
+        userName?: string,
+   
+}

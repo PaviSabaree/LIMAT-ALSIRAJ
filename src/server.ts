@@ -7,8 +7,8 @@ import * as YAML from 'yamljs';
 import * as swaggerUi from 'swagger-ui-express';
 
 import HomeRoute from './routes/home/home.route'
-import AuthRoute from 'routes/auth/auth.route'
-import authenticateToken from 'middleware/authentication'
+import AuthRoute from './routes/auth/auth.route'
+import authenticateToken from './middleware/authentication';
 
 const server: express.Application = express();
 
@@ -45,7 +45,6 @@ const app = new App({
         bodyParser.json(),
         bodyParser.urlencoded({ extended: true }),
         loggerMiddleware,
-        authenticateToken
     ],
 })
 

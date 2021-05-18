@@ -1,5 +1,5 @@
 import * as express from 'express'
-import authenticateToken from 'middleware/authentication';
+import authenticateToken from '../../middleware/authentication';
 import Service from '../../service/service';
 
 class HomeRoute  {
@@ -8,14 +8,14 @@ class HomeRoute  {
     protected service:Service; 
     
     constructor() {
-        this.router.get('/', authenticateToken, this.getUsers);
+        this.router.get('/test', authenticateToken, this.getUsers);
         this.service = new Service();
 
     }
     
-    private getUsers = (req: express.Request, res: express.Response,next) => {
+    private getUsers = async (req: express.Request, res: express.Response,next) => {
 
-        const result = this.service.getUsers();
+        const result =await this.service.getUsers();
 
         console.log(result)
         
