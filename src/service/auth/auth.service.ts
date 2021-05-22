@@ -1,4 +1,5 @@
 require('dotenv').config()
+import * as bcrypt from 'bcrypt'
 
 import * as jwt from "jsonwebtoken";
 import { ILoginInfo, IUserInformation } from "../../interfaces/IUser.interface";
@@ -42,7 +43,17 @@ class AuthService {
 
         const userDbInfo = await UserSchema.find({'emailId': userInformation.emailId}).exec();
 
+        const passwordValidation = await this._isValidPassword( userDbInfo[0].password, user.password)
+
         user.userType = userDbInfo[0]['userType']
+
+        console.log('user.password ==', user.password)
+
+        console.log('userDbInfo[0].password ==', userDbInfo[0].password)
+
+        if(!passwordValidation){
+          throw new Error('Given password is wrong please check you passwod')
+        }
 
         if(userDbInfo.length){
 
@@ -109,6 +120,14 @@ class AuthService {
 
   private async _generateRefreshToken(user) {
     return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30m' })
+  }
+
+  private async _isValidPassword(hashPassword, inputPassword){
+    try {
+      return await bcrypt.compare(inputPassword, hashPassword)
+    } catch (error) {
+      throw error
+    }
   }
 }
 

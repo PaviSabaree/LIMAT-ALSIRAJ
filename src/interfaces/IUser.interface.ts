@@ -1,5 +1,5 @@
 import { Request } from 'express';
-export interface IUserInformation{
+export interface IUserInformation {
 
         userName: string,
         firstName: string,
@@ -12,6 +12,7 @@ export interface IUserInformation{
         documentUrl: string
     
 }
+
 
 export interface IRequestExtended extends Request{
        user : any
