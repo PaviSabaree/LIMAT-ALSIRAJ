@@ -8,6 +8,7 @@ import * as swaggerUi from 'swagger-ui-express';
 
 import HomeRoute from './routes/home/home.route'
 import AuthRoute from './routes/auth/auth.route'
+import MemberSkillRoute from './routes/skills/member-skill.route';
 
 const server: express.Application = express();
 
@@ -24,7 +25,8 @@ const app = new App({
     ],
     controllers: [
         new HomeRoute(),
-        new AuthRoute()
+        new AuthRoute(),
+        new MemberSkillRoute()
     ],
 })
 
