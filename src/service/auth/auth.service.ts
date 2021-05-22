@@ -39,7 +39,10 @@ class AuthService {
           password: userInformation.password,
         }
 
+
         const userDbInfo = await UserSchema.find({'emailId': userInformation.emailId}).exec();
+
+        user.userType = userDbInfo[0]['userType']
 
         if(userDbInfo.length){
 
@@ -89,7 +92,8 @@ class AuthService {
     
           accessToken = await this._generateAccessToken( {
             emailId: user.emailId,
-            password:user.password
+            password:user.password,
+            userType:user.userType
           })
 
           resolve(accessToken)

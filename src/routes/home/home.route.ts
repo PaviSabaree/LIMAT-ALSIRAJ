@@ -1,6 +1,8 @@
 import * as express from 'express'
+import { IRequestExtended } from '../../interfaces/IUser.interface';
 import authenticateToken from '../../middleware/authentication';
 import Service from '../../service/service';
+
 
 class HomeRoute  {
 
@@ -8,18 +10,43 @@ class HomeRoute  {
     protected service:Service; 
     
     constructor() {
-        this.router.get('/test', authenticateToken, this.getUsers);
+        this.router.get('/masters/any/users/list', authenticateToken, this.getUsers);
+        this.router.get('/masters/any/admin/list', authenticateToken, this.getAdmins);
         this.service = new Service();
 
     }
     
-    private getUsers = async (req: express.Request, res: express.Response,next) => {
+    private  getUsers = async (req: express.Request, res: express.Response, next) => {
 
-        const result =await this.service.getUsers();
+        try {
 
-        console.log(result)
-        
-        res.json(result);  
+            const result =await this.service.getUsers();
+            
+            res.json(result);   
+        } catch (err) {
+             console.log("Error occured in getting user list",err);
+
+                res.status(400).json({
+                    message: err.toString()
+                }); 
+        }
+
+    }
+
+    private  getAdmins = async (req: IRequestExtended, res: express.Response, next) => {
+
+        try {
+            const result =await this.service.getAdmins(req.user);
+          
+            res.json(result);   
+        } catch (err) {
+             console.log("Error occured in getting admin list",err);
+
+                res.status(400).json({
+                    message: err.toString()
+                }); 
+        }
+
     }
 }
 

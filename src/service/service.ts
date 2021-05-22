@@ -1,6 +1,6 @@
 import { UserSchema } from "../schema/user.schema";
 import * as jwt from "jsonwebtoken";
-import { IUserInformation } from "../interfaces/IUser.interface";
+import { ILoginInfo, IUserInformation } from "../interfaces/IUser.interface";
 import { IGetUsers } from "../models/i-get-user";
 
 class Service {
@@ -66,6 +66,35 @@ class Service {
       }
     }
 
+    public async getUsers(): Promise<any> {
+
+      try {
+        
+        return await  UserSchema.find({'userType': 'Public'}).exec()
+      } catch (error) {
+        
+        console.log('error while getting user list from db ', error )
+
+        throw error
+      }   
+    }
+    public async getAdmins(user: ILoginInfo): Promise<any> {
+
+      try {
+
+        if(user.userType === 'admin'){
+          return await  UserSchema.find({'userType': 'admin'}).exec()
+        }
+        throw new Error('Only admin can view the admin list, You are not allowed')
+           
+      } catch (error) {
+        
+        console.log('error while getting user list from db ', error )
+
+        throw error
+      }   
+    }
+
   private async generateAccessToken(user) {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' })
   }
@@ -73,22 +102,7 @@ class Service {
   private async generateRefreshToken(user) {
     return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30m' })
   }
-  public async getUsers(): Promise<IGetUsers[]> {
-    return [
-      {
-        id: 1,
-        name: "Rakesh",
-      },
-      {
-        id: 2,
-        name: "Venkat",
-      },
-      {
-        id: 3,
-        name: "Asharaf",
-      },
-    ];
-  }
+
 }
 
 export default Service;

@@ -1,3 +1,4 @@
+import { Request } from 'express';
 export interface IUserInformation{
 
         userName: string,
@@ -12,9 +13,14 @@ export interface IUserInformation{
     
 }
 
+export interface IRequestExtended extends Request{
+       user : any
+}
+
 export interface ILoginInfo{
         emailId: string,
         password: string,
         userName?: string,
+        userType?: string
    
 }
