@@ -3,8 +3,14 @@
         "sourceMap": true,
         "target": "es6",
         "module": "commonjs",
+        "declaration": false,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
         "outDir": "./dist",
-        "resolveJsonModule": true
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "forceConsistentCasingInFileNames": true,
     },
     "include": [
         "src/**/*.ts"
@@ -13,3 +19,4 @@
         "node_modules"
     ]
 }
+

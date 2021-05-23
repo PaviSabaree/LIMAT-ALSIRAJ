@@ -1,8 +1,6 @@
 import { UserSchema } from "../schema/user.schema";
 import * as jwt from "jsonwebtoken";
 import { ILoginInfo, IUserInformation } from "../interfaces/IUser.interface";
-import { IGetUsers } from "../models/i-get-user";
-
 class Service {
   /* function to create new User */
   public async signUp(userInformation: IUserInformation): Promise<any> {
