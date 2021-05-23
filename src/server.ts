@@ -5,7 +5,7 @@ import * as express from 'express'
 import * as YAML from 'yamljs';
 
 import * as swaggerUi from 'swagger-ui-express';
-
+var cors = require('cors')
 import HomeRoute from './routes/home/home.route'
 import AuthRoute from './routes/auth/auth.route'
 
@@ -13,13 +13,12 @@ const server: express.Application = express();
 
 const swaggerDocument = YAML.load('docs/swagger.yaml');
 
-
 const app = new App({
     port: 5000,
     middleWares: [
 
-        bodyParser.json(),
-        bodyParser.urlencoded({ extended: true }),
+		bodyParser.json({ limit: '50mb' }),
+		bodyParser.urlencoded({ limit: '50mb', extended: true }),
         loggerMiddleware
     ],
     controllers: [
@@ -27,6 +26,8 @@ const app = new App({
         new AuthRoute()
     ],
 })
+
+
 
 app.dbConnection();
 

@@ -10,6 +10,7 @@ class AuthRoute  {
         this.router.post('/masters/any/users/add', this._signup);
         this.router.post('/auth/signin', this._signIn);
         this.router.post('/auth/getAuthToken', this._getAuthToken);
+        this.router.post('/auth/upload', this._upload);
         this.authService = new AuthService();
 
     }
@@ -87,6 +88,25 @@ class AuthRoute  {
                 message: err.toString()
             });  
         }
+    }
+
+    private  _upload = async (req: express.Request, res: express.Response) => {
+
+        try {
+            
+            const result = await this.authService.uploadFileToS3(req);
+            
+            res.json({ data :  result });  
+        } catch (err) {
+ 
+            console.log("Error occured in _signup",err);
+
+                res.status(400).json({
+                    message: err
+                });  
+           
+        }
+       
     }
 }
 
