@@ -112,7 +112,7 @@ class AuthService {
       })
     }
 
-    public async uploadFileToS3(req: any): Promise<any> {
+/*     public async uploadFileToS3(req: any): Promise<any> {
 
       return new Promise((resolve, reject)=> { 
 
@@ -143,7 +143,7 @@ class AuthService {
           
 
         })
-    }
+    } */
 
   private async _generateAccessToken(user) {
     console.log('qq', user);

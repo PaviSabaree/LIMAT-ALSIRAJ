@@ -10,7 +10,7 @@ class AuthRoute  {
         this.router.post('/masters/any/users/add', this._signup);
         this.router.post('/auth/signin', this._signIn);
         this.router.post('/auth/getAuthToken', this._getAuthToken);
-        this.router.post('/auth/upload', this._upload);
+     //   this.router.post('/auth/upload', this._upload);
         this.authService = new AuthService();
 
     }
@@ -90,7 +90,7 @@ class AuthRoute  {
         }
     }
 
-    private  _upload = async (req, res: express.Response) => {
+   /*  private  _upload = async (req, res: express.Response) => {
 
         try {
             
@@ -107,7 +107,7 @@ class AuthRoute  {
            
         }
        
-    }
+    } */
 }
 
 export default AuthRoute
