@@ -90,7 +90,7 @@ class AuthRoute  {
         }
     }
 
-    private  _upload = async (req: express.Request, res: express.Response) => {
+    private  _upload = async (req, res: express.Response) => {
 
         try {
             

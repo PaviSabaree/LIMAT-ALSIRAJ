@@ -1,4 +1,5 @@
 import * as express from "express";
+import authenticateToken from "../../middleware/authentication";
 import EventService from "../../service/events/event.service";
 
 
@@ -6,10 +7,10 @@ class EventRoutes {
     protected router = express.Router();
     protected service: EventService;
     constructor( ){
-        this.router.post('/masters/any/competition/add', this._addEvent);
-        this.router.put('/masters/any/competition/edit/:id', this._editEvent);
-        this.router.delete('/masters/any/competition/delete/:id', this._deleteEvent);
-        this.router.get('/masters/any/competition/list', this._getEvents);
+        this.router.post('/masters/any/competition/add', authenticateToken,this._addEvent);
+        this.router.put('/masters/any/competition/edit/:id',authenticateToken, this._editEvent);
+        this.router.delete('/masters/any/competition/delete/:id', authenticateToken,this._deleteEvent);
+        this.router.get('/masters/any/competition/list',authenticateToken, this._getEvents);
         this.service = new EventService()
 
     }

@@ -11,10 +11,10 @@ class MemberSkillRoute  {
     protected skillService:MemberSkillService; 
     
     constructor() {
-        this.router.post('/member/skill', this.addMemberSkillSet);
-        this.router.get('/member/skill/list', this.getMemberSkillSet);
-        this.router.put('/member/skill/edit', this.editMemberSkillSet);
-        this.router.delete('/member/skill/delete/:id', this.deleteMemberSkillSet);
+        this.router.post('/masters/any/skills/add', authenticateToken, this.addMemberSkillSet);
+        this.router.get('/masters/any/skills/list', authenticateToken, this.getMemberSkillSet);
+        this.router.put('/masters/any/skills/edit/:id', authenticateToken, this.editMemberSkillSet);
+        this.router.delete('/masters/any/skills/delete/:id',authenticateToken, this.deleteMemberSkillSet);
 
         this.skillService = new MemberSkillService();
 
@@ -29,8 +29,13 @@ class MemberSkillRoute  {
             if(!skillSaveResult && skillSaveResult === undefined){
                 throw new Error('unable to save member skill set');
             }
+
+            const response = {
+                status : 200,
+                message: `Skills created sucessfully and id = ${skillSaveResult._id}` 
+            }
             
-            res.json({ data :  skillSaveResult });   
+            res.json({ data :  response });   
         } catch (err) {
              console.log("MemberSkillRoute: Error occured in addMemberSkillSet",err);
 
@@ -48,12 +53,10 @@ class MemberSkillRoute  {
 
             if(req.query && req.query.userId){
                 userId = req.query.userId;
-            }else {
-                throw new Error('Bad Request, User Id required to process');
             }
             
 
-            const skillSaveResultArray = await this.skillService.getMemberSkillList(userId);
+            const skillSaveResultArray = await this.skillService.getMemberSkillList(userId, req.user);
           
             res.json({ data :  skillSaveResultArray });    
         } catch (err) {
@@ -69,13 +72,18 @@ class MemberSkillRoute  {
     private  editMemberSkillSet = async (req: IRequestExtended, res: express.Response, next) => {
 
         try {
-            const skillSaveResultObject = await this.skillService.editMemberSkillSet(req.body);
+            const skillSaveResultObject = await this.skillService.editMemberSkillSet(req.body, req.params.id);
           
             if(!skillSaveResultObject && skillSaveResultObject === undefined){
                 throw new Error('unable to update member skill set');
             }
+
+            const response = {
+                status : 200,
+                message: `Skills updated sucessfully and id = ${skillSaveResultObject._id}` 
+            }
             
-            res.json({ data :  skillSaveResultObject });  
+            res.json({ data :  response });  
         } catch (err) {
              console.log("Error occured in getting admin list",err);
 
@@ -91,7 +99,17 @@ class MemberSkillRoute  {
         try {
             const result = await this.skillService.deleteMemberSkillSet(req.params.id);
           
-            res.json({ data :  result });  
+
+            if(!result && result === undefined){
+                throw new Error('unable to delete event');
+            }
+
+            const response = {
+                status : 200,
+                message: `Skill deleted sucessfully and id = ${result._id}` 
+            }
+
+            res.json({ data :  response });  
         } catch (err) {
              console.log("Error occured in getting admin list",err);
 

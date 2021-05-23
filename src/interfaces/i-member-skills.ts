@@ -1,7 +1,8 @@
 export interface IMemberSkills {
-    UserName: string;
-    UserId: string;
-    Skills: string;
-    Exp: number;
-    EmailId: string;
+    userName?: string;
+    skillId?: string;
+    userId?: string;
+    skills: string;
+    exp: string;
+    emailId: string;
 }

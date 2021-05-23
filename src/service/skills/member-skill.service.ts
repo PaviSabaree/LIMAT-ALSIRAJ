@@ -6,11 +6,11 @@ class MemberSkillService {
     public async addMemberSkillSet(skillSetObj: IMemberSkills):Promise<any> {
         try {
             const skillSet = new MemberSkillSetSchema({
-                UserName: skillSetObj.UserName,
-                UserId: skillSetObj.UserId,
-                Skills: skillSetObj.Skills,
-                Exp: skillSetObj.Exp,
-                EmailId: skillSetObj.EmailId,
+                userName: skillSetObj.userName,
+                userId: skillSetObj.userId,
+                skills: skillSetObj.skills,
+                exp: skillSetObj.exp,
+                emailId: skillSetObj.emailId,
             });
 
             return await skillSet.save();
@@ -20,25 +20,37 @@ class MemberSkillService {
         }
     }
 
-    public async getMemberSkillList(userId: string):Promise<any> {
+    public async getMemberSkillList(userId: string, userInfo):Promise<any> {
         try {
 
-            return await  MemberSkillSetSchema.find({'UserId': userId}).exec()
+           if(userId){
+               // authenticate user details             
+                return await  MemberSkillSetSchema.find({'userId': userId}).exec()
+
+           }else{
+               // authenticate admin user to gibe all users skills
+
+               if(userInfo.userType === 'admin'){
+                return await  MemberSkillSetSchema.find().exec()
+               }
+           }
+
+            
         }catch(err){
             console.debug("Error occured in getMemberSkillList");
             throw err;
         }
     }
 
-    public async editMemberSkillSet(skillSetObj: IMemberSkills):Promise<any> {
+    public async editMemberSkillSet(skillSetObj: IMemberSkills, skillId: string):Promise<any> {
         try {
 
-            return await MemberSkillSetSchema.updateOne(
-                    {UserId: skillSetObj.UserId},
+            return await MemberSkillSetSchema.findOneAndUpdate(
+                    {'_id': skillId},
                     {
                         $set: {
-                            Skills: skillSetObj.Skills,
-                            Exp: skillSetObj.Exp,  
+                            'skills': skillSetObj.skills,
+                            'exp': skillSetObj.exp,  
                         }
                     }
                 ).exec();        
@@ -52,7 +64,7 @@ class MemberSkillService {
     public async deleteMemberSkillSet(skillSetId: string):Promise<any> {
         try {
             
-            return await MemberSkillSetSchema.deleteOne({"_id" : skillSetId }).exec();
+            return await MemberSkillSetSchema.findOneAndDelete({"_id" : skillSetId }).exec();
         }catch(err){
             console.debug("Error occured in deleteMemberSkillSet");
             throw err;

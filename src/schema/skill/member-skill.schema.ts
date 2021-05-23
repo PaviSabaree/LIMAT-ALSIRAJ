@@ -1,24 +1,24 @@
 import mongoose = require("mongoose");
 
 const  MemberSkillSet = new mongoose.Schema({
-    UserName: {
+    userName: {
         type: String,
         required: true
     },
-    UserId: {
+    userId: {
         type: String,
         required: true
     },
-    Skills: {
+    skills: {
         type: String,
         unique : true,
         required: true
     },
-    Exp: {
-        type: Number,
+    exp: {
+        type: String,
         required: true
     },
-    EmailId: {
+    emailId: {
         type: String,
         required: true,
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
