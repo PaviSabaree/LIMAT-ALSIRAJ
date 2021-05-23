@@ -47,7 +47,7 @@ class App {
 
     public dbConnection(){
         // Connecting to the database
-        mongodb.connect(DBConnection.dbConnection, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+        mongodb.connect(DBConnection.dbConnection, {useNewUrlParser: true, useUnifiedTopology: true, }).then(() => {
         console.log("Successfully connected to the database !!");
         this.listening();
         }).catch((err: any) => {
