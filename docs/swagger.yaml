@@ -22,7 +22,9 @@ tags:
   - name: 'User Authentication'
     description: __Rest API's sample to Authenticate user details.__
   - name: 'Competitions'
-    description: __Rest API's to get all information releated to competitions.__    
+    description: __Rest API's to get all information releated to competitions.__
+  - name: 'Skills'
+    description: __Rest API's to get all information releated to competitions.__      
 schemes:
   - http
   - https
@@ -35,6 +37,130 @@ securityDefinitions:
 security:
   - Bearer: []
 paths:
+  /masters/any/skills/add:
+    post:
+      tags:
+        - 'Skills'
+      summary: To add new Skill fpr users
+      operationId: _addMemberSkillSet
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/SkillInputInformation'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /masters/any/skills/list:
+    get:
+      tags:
+        - 'Skills'
+      summary: To get skill list
+      operationId: _getMemberSkillSet
+      parameters:
+        - in: query
+          name: userId
+          required: false
+          type: string  
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                type: 'array'
+                items:
+                   $ref: '#/definitions/SkillGetInformation'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: User need to provide userId to see his skill, Admin can see all users skills
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'        
+  /masters/any/skills/edit/{id}:
+    put:
+      tags:
+        - 'Skills'
+      summary: To edit the specific skill
+      operationId: _editMemberSkillSet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string  
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/SkillEditInputInformation'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /masters/any/skills/delete/{id}:
+    delete:
+      tags:
+        - 'Skills'
+      summary: To delete the specific skill
+      operationId: _deleteMemberSkillSet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string  
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'        
   /masters/any/competition/add:
     post:
       tags:
@@ -306,6 +432,41 @@ definitions:
         type: string
       description:
         type: number
+  SkillInputInformation:
+    type: object
+    properties:
+      userName:
+        type: string
+      userId:
+        type: string
+      skills:
+        type: string
+      exp:
+        type: string
+      emailId:
+        type: string
+  SkillGetInformation:
+    type: object
+    properties:
+      _id:
+        type: string
+      userName:
+        type: string
+      userId:
+        type: string
+      skills:
+        type: string
+      exp:
+        type: string
+      emailId:
+        type: string        
+  SkillEditInputInformation:
+    type: object
+    properties:
+      skills:
+        type: string
+      exp:
+        type: string
   GetEvents:
     type: object
     properties:

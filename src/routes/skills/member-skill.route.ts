@@ -11,16 +11,16 @@ class MemberSkillRoute  {
     protected skillService:MemberSkillService; 
     
     constructor() {
-        this.router.post('/masters/any/skills/add', authenticateToken, this.addMemberSkillSet);
-        this.router.get('/masters/any/skills/list', authenticateToken, this.getMemberSkillSet);
-        this.router.put('/masters/any/skills/edit/:id', authenticateToken, this.editMemberSkillSet);
-        this.router.delete('/masters/any/skills/delete/:id',authenticateToken, this.deleteMemberSkillSet);
+        this.router.post('/masters/any/skills/add', authenticateToken, this._addMemberSkillSet);
+        this.router.get('/masters/any/skills/list', authenticateToken, this._getMemberSkillSet);
+        this.router.put('/masters/any/skills/edit/:id', authenticateToken, this._editMemberSkillSet);
+        this.router.delete('/masters/any/skills/delete/:id',authenticateToken, this._deleteMemberSkillSet);
 
         this.skillService = new MemberSkillService();
 
     }
     
-    private  addMemberSkillSet = async (req: express.Request, res: express.Response, next) => {
+    private  _addMemberSkillSet = async (req: express.Request, res: express.Response, next) => {
 
         try {
 
@@ -46,7 +46,7 @@ class MemberSkillRoute  {
 
     }
 
-    private  getMemberSkillSet = async (req: IRequestExtended, res: express.Response, next) => {
+    private  _getMemberSkillSet = async (req: IRequestExtended, res: express.Response, next) => {
 
         try {
             let userId;
@@ -69,7 +69,7 @@ class MemberSkillRoute  {
 
     }
 
-    private  editMemberSkillSet = async (req: IRequestExtended, res: express.Response, next) => {
+    private  _editMemberSkillSet = async (req: IRequestExtended, res: express.Response, next) => {
 
         try {
             const skillSaveResultObject = await this.skillService.editMemberSkillSet(req.body, req.params.id);
@@ -94,7 +94,7 @@ class MemberSkillRoute  {
 
     }
 
-    private  deleteMemberSkillSet = async (req: IRequestExtended, res: express.Response, next) => {
+    private  _deleteMemberSkillSet = async (req: IRequestExtended, res: express.Response, next) => {
 
         try {
             const result = await this.skillService.deleteMemberSkillSet(req.params.id);

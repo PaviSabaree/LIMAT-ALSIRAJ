@@ -11,7 +11,6 @@ const  MemberSkillSet = new mongoose.Schema({
     },
     skills: {
         type: String,
-        unique : true,
         required: true
     },
     exp: {
