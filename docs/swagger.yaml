@@ -21,6 +21,8 @@ tags:
     description: __Rest API's to get new Access Token.__
   - name: 'User Authentication'
     description: __Rest API's sample to Authenticate user details.__
+  - name: 'Competitions'
+    description: __Rest API's to get all information releated to competitions.__    
 schemes:
   - http
   - https
@@ -31,8 +33,127 @@ securityDefinitions:
         name: Authorization
         in: header
 security:
-  - Bearer: []          
+  - Bearer: []
 paths:
+  /masters/any/competition/add:
+    post:
+      tags:
+        - 'Competitions'
+      summary: To add new competitions
+      operationId: _addEvent
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/EventInputInformation'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To create new competition
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /masters/any/competition/edit/{id}:
+    put:
+      tags:
+        - 'Competitions'
+      summary: To update existing competition details
+      operationId: _editEvent
+      parameters:
+       - in: path
+         name: id
+         required: true
+         type: string
+       - in: body
+         name: body
+         required: true
+         schema:
+            $ref: '#/definitions/EventInputInformation'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description:  To udpate new competition
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /masters/any/competition/delete/{id}:
+    delete:
+      tags:
+        - 'Competitions'
+      summary: To delete existing competition
+      operationId: _deleteEvent
+      parameters:
+       - in: path
+         name: id
+         required: true
+         type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To delete new competition
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /masters/any/competition/list:
+    get:
+      tags:
+        - 'Competitions'
+      summary: To get existing competitions
+      operationId: _getEvents
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                type: 'array'
+                items:
+                 $ref: '#/definitions/GetEvents'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To get existing competitions
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'      
   /masters/any/users/add:
     post:
       tags:
@@ -170,6 +291,45 @@ definitions:
         type: string
       documentUrl:
         type: string
+  EventInputInformation:
+    type: object
+    properties:
+      competitionName:
+        type: string
+      type:
+        type: string
+      status:
+        type: string
+      startDate:
+        type: string
+      endDate:
+        type: string
+      description:
+        type: number
+  GetEvents:
+    type: object
+    properties:
+      id:
+        type: string
+      competitionName:
+        type: string
+      type:
+        type: string
+      status:
+        type: string
+      startDate:
+        type: string
+      endDate:
+        type: string
+      description:
+        type: number        
+  GenralResponse:
+    type: object
+    properties:
+     status:
+      type: number
+     message:
+      type: string
   GetRefreshTokenInfo:
     type: object
     properties:

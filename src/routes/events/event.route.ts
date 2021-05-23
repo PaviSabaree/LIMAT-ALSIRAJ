@@ -21,8 +21,13 @@ class EventRoutes {
             if(!eventsResult && eventsResult === undefined){
                 throw new Error('unable to save event');
             }
+
+            const response = {
+                status : 200,
+                message: `Event created sucessfully and id = ${eventsResult._id}` 
+            }
             
-            res.json({ data :  eventsResult }); 
+            res.json({ data :  response }); 
         } catch (error) {
             
             console.log("EventRoute: Error occured in addEventroure",error);
@@ -40,8 +45,13 @@ class EventRoutes {
             if(!eventsResult && eventsResult === undefined){
                 throw new Error('unable to update event');
             }
+
+            const response = {
+                status : 200,
+                message: `Event updated sucessfully and id = ${eventsResult._id}` 
+            }
             
-            res.json({ data :  eventsResult }); 
+            res.json({ data :  response }); 
         } catch (error) {
             
             console.log("EventRoute: Error occured in _editEvent",error);
@@ -59,8 +69,13 @@ class EventRoutes {
             if(!eventsResult && eventsResult === undefined){
                 throw new Error('unable to delete event');
             }
+
+            const response = {
+                status : 200,
+                message: `Event deleted sucessfully and id = ${eventsResult._id}` 
+            }
             
-            res.json({ data :  eventsResult }); 
+            res.json({ data :  response }); 
         } catch (error) {
             
             console.log("EventRoute: Error occured in _deleteEvent",error);
