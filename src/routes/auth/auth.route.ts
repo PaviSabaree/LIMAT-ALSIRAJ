@@ -35,7 +35,7 @@ class AuthRoute  {
             console.log("Error occured in _signup",err);
 
                 res.status(400).json({
-                    message: err
+                    message: err.toString()
                 });  
            
         }
