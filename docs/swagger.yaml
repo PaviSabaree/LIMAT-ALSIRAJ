@@ -24,7 +24,9 @@ tags:
   - name: 'Competitions'
     description: __Rest API's to get all information releated to competitions.__
   - name: 'Skills'
-    description: __Rest API's to get all information releated to competitions.__      
+    description: __Rest API's to get all information releated to competitions.__
+  - name: 'Participants'
+    description: __Rest API's to get all information releated to participants.__     
 schemes:
   - http
   - https
@@ -67,6 +69,129 @@ paths:
         - 'application/json'
       produces:
         - 'application/json'
+  /masters/any/userparticipant/add:
+    post:
+      tags:
+        - 'Participants'
+      summary: To apply new Event/Competition
+      operationId: _applyEvent
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/AddParticipantsInput'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /masters/any/userparticipant/list:
+    get:
+      tags:
+        - 'Participants'
+      summary: To get all/own participants list
+      operationId: _getParticipantsList
+      parameters:
+        - in: query
+          name: userId
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+               type: 'array'
+               items:
+                 $ref: '#/definitions/getAllParticipantsList'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /masters/any/userparticipant/{id}/{value}:
+    put:
+      tags:
+        - 'Participants'
+      summary: To approve/reject the participants
+      operationId: _approveParticipant
+      parameters:
+        - in: path
+          name: value
+          required: true
+          type: string
+        - in: path
+          name: id
+          required: true
+          type: string          
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                 $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+  /masters/any/userparticipant/delete/{id}:
+    delete:
+      tags:
+        - 'Participants'
+      summary: To delete the apply event
+      operationId: _deleteParticipant
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string          
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                 $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'         
   /masters/any/skills/list:
     get:
       tags:
@@ -396,6 +521,32 @@ paths:
         - 'application/json'                    
 
 definitions:
+  getAllParticipantsList:
+    type: object
+    properties:
+      _id:
+        type: string
+      userName:
+        type: string
+      eventId:
+        type: string
+      userId:
+        type: string
+      emailId:
+        type: string
+      status:
+        type: string
+  AddParticipantsInput:
+    type: object
+    properties:
+      userName:
+        type: string
+      eventId:
+        type: string
+      userId:
+        type: string
+      emailId:
+        type: string
   SignUpUserInputInfo:
     type: object
     properties:
