@@ -6,15 +6,25 @@ class ParticipationsService {
 
     public async applyEvent(userInformation: IApplyEvent):Promise<any> {
         try {
-            const participants = new Participations({
-                userName: userInformation.userName,
-                userId: userInformation.userId,
-                eventId: userInformation.eventId,
-                emailId: userInformation.emailId,
-                status: 'Pending'
-            });
 
-            return await participants.save();
+            const checkAlreadyApplied = await this._isUserAlreadyAppliedForevent(
+                userInformation.userId, userInformation.eventId)
+
+                if(!checkAlreadyApplied){
+                    const participants = new Participations({
+                        userName: userInformation.userName,
+                        userId: userInformation.userId,
+                        eventId: userInformation.eventId,
+                        emailId: userInformation.emailId,
+                        status: 'Pending'
+                    });
+        
+                    return await participants.save();
+                }
+
+                throw new Error('You Already apply for this event, Please edit or apply for new Event')
+
+          
         }catch(err){
             console.debug("Error occured in applyEvent");
             throw err;
@@ -63,6 +73,23 @@ class ParticipationsService {
             
         }catch(err){
             console.debug("Error occured in approveParticipant");
+            throw err;
+        }
+    }
+
+    private async _isUserAlreadyAppliedForevent(userId: string, eventId: string):Promise<boolean> {
+        try {
+
+            const dbResponse = await Participations.findOne({'userId': userId}).exec();
+            console.log('dbResponse ===', dbResponse, eventId, userId )
+            if(dbResponse && dbResponse['eventId'] === eventId){
+
+                return true
+            }
+            
+            return false
+        }catch(err){
+            console.debug("Error occured in getEvents");
             throw err;
         }
     }

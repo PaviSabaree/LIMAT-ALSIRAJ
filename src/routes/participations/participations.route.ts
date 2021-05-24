@@ -84,7 +84,7 @@ class ParticipationsRoute {
 
             const response = {
                 status : 200,
-                message: `SucessFully approved the participant` 
+                message: `SucessFully approved/rejected the participant` 
             }
 
             res.json({ data :  response });   
