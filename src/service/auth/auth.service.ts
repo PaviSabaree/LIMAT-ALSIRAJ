@@ -47,10 +47,6 @@ class AuthService {
 
         user.userType = userDbInfo[0]['userType']
 
-        console.log('user.password ==', user.password)
-
-        console.log('userDbInfo[0].password ==', userDbInfo[0].password)
-
         if(!passwordValidation){
           throw new Error('Given password is wrong please check you passwod')
         }

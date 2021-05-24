@@ -2,7 +2,13 @@ export interface IMemberSkills {
     userName?: string;
     skillId?: string;
     userId?: string;
-    skills: string;
-    exp: string;
+    skills?: string;
+    exp?: string;
     emailId: string;
 }
+
+export interface IApplyEvent extends IMemberSkills{
+    eventId : string 
+    status: string
+}
+

@@ -15,7 +15,7 @@ export interface IUserInformation {
 
 
 export interface IRequestExtended extends Request{
-       user : any
+       user : ILoginInfo
 }
 
 export interface ILoginInfo{

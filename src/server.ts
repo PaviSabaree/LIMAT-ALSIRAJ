@@ -10,6 +10,7 @@ import HomeRoute from './routes/home/home.route'
 import AuthRoute from './routes/auth/auth.route'
 import MemberSkillRoute from './routes/skills/member-skill.route';
 import EventRoutes from './routes/events/event.route';
+import ParticipationsRoute from './routes/participations/participations.route';
 
 const server: express.Application = express();
 
@@ -27,7 +28,8 @@ const app = new App({
         new HomeRoute(),
         new AuthRoute(),
         new MemberSkillRoute(),
-        new EventRoutes()
+        new EventRoutes(),
+        new ParticipationsRoute()
     ],
 })
 
