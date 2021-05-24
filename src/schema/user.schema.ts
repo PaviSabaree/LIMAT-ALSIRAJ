@@ -37,6 +37,10 @@ import { IUserInformation } from "../interfaces/IUser.interface";
         type: String,
         required: false
     },
+    socialAuth: {
+        type: Boolean,
+        required: false
+    },
     documentUrl: {
         type: String,
         required: false

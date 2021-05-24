@@ -17,7 +17,7 @@ class AuthService {
       console.log('db user value ==', checkExistingUser)
 
       if(checkExistingUser){
-        if(userInformation.appUser === 'appuser'){
+        if(userInformation.socialAuth){
 
           return checkExistingUser
         }else{
@@ -34,6 +34,7 @@ class AuthService {
           appUser: userInformation.appUser,
           userType: userInformation.userType,
           documentUrl: userInformation.documentUrl,
+          socialAuth: userInformation.socialAuth? true : false
         });
   
         return await user.save();

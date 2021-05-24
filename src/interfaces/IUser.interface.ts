@@ -9,7 +9,8 @@ export interface IUserInformation {
         phoneNumber: number,
         appUser: string,
         userType: string,
-        documentUrl: string
+        documentUrl: string,
+        socialAuth?: boolean
     
 }
 

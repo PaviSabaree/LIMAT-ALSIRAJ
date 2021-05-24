@@ -19,10 +19,10 @@ class AuthRoute  {
 
         try {
             const {userName, firstName, lastName, password, emailId, phoneNumber,
-                 appUser, userType, documentUrl}= req.body
+                 appUser, userType, documentUrl, socialAuth}= req.body
 
             const result = await this.authService.signUp({userName, firstName, lastName, 
-                password, emailId, phoneNumber, appUser, userType, documentUrl});   
+                password, emailId, phoneNumber, appUser, userType, documentUrl, socialAuth});   
 
 
             if(!result && result === undefined){
