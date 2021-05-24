@@ -17,7 +17,7 @@ class AuthService {
       console.log('db user value ==', checkExistingUser)
 
       if(checkExistingUser){
-        if(userInformation.userType === 'appuser'){
+        if(userInformation.appUser === 'appuser'){
 
           return checkExistingUser
         }else{
