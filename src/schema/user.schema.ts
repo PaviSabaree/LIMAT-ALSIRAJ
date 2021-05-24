@@ -13,7 +13,7 @@ import { IUserInformation } from "../interfaces/IUser.interface";
     },
     lastName: {
         type: String,
-        required: true
+        required: false
     },
     password: {
         type: String,
@@ -27,15 +27,15 @@ import { IUserInformation } from "../interfaces/IUser.interface";
     },
     phoneNumber: {
         type: String,
-        required: true
+        required: false
     },
     appUser: {
         type: String,
-        required: true
+        required: false
     },
     userType: {
         type: String,
-        required: true
+        required: false
     },
     documentUrl: {
         type: String,
