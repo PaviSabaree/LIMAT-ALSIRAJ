@@ -11,19 +11,35 @@ class AuthService {
   /* function to create new User */
   public async signUp(userInformation: IUserInformation): Promise<any> {
     try {
-      const user = new UserSchema({
-        userName: userInformation.userName,
-        firstName: userInformation.firstName,
-        lastName: userInformation.lastName,
-        password: userInformation.password,
-        emailId: userInformation.emailId,
-        phoneNumber: userInformation.phoneNumber,
-        appUser: userInformation.appUser,
-        userType: userInformation.userType,
-        documentUrl: userInformation.documentUrl,
-      });
 
-      return await user.save();
+      const checkExistingUser = await this._checkExistinguser(userInformation)
+
+      console.log('db user value ==', checkExistingUser)
+
+      if(checkExistingUser){
+        if(userInformation.userType === 'appuser'){
+
+          return checkExistingUser
+        }else{
+          throw new Error('User Already Exist with this mail Id, Please user different user or use forget passoword')
+        }
+      }else{
+        const user = new UserSchema({
+          userName: userInformation.userName,
+          firstName: userInformation.firstName,
+          lastName: userInformation.lastName,
+          password: userInformation.password,
+          emailId: userInformation.emailId,
+          phoneNumber: userInformation.phoneNumber,
+          appUser: userInformation.appUser,
+          userType: userInformation.userType,
+          documentUrl: userInformation.documentUrl,
+        });
+  
+        return await user.save();
+      }
+
+
     } catch (err) {
       console.log("Exception occured in signUp", err);
 
@@ -140,6 +156,14 @@ class AuthService {
 
         })
     } */
+
+
+    private async _checkExistinguser(userInformation: IUserInformation) {
+     
+      const dbResponse = await UserSchema.findOne({'emailId': userInformation.emailId}).exec()
+
+      return dbResponse
+    }
 
   private async _generateAccessToken(user) {
     console.log('qq', user);

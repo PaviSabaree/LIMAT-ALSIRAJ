@@ -17,7 +17,7 @@ import { IUserInformation } from "../interfaces/IUser.interface";
     },
     password: {
         type: String,
-        required: true
+        required: false
     },
     emailId: {
         type: String,
