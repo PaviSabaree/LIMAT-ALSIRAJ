@@ -1,8 +1,10 @@
 import { DBConnection } from './config/constant.enum'
 import * as express from 'express'
 import * as mongodb from 'mongoose'
-var cors = require('cors')
-var multer = require('multer')
+import * as multer from 'multer'
+import * as cors from 'cors'
+
+
 
 const upload = multer({ dest: `upload/` })
 class App {

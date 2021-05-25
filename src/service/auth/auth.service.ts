@@ -129,15 +129,13 @@ class AuthService {
 
       return new Promise((resolve, reject)=> { 
 
-        console.log('request2 =====', req.files)
-
         var dateObj = new Date().toLocaleDateString().split('/');
         var filename = "userupload/" + dateObj.join('') + "/" + req.files[0].originalname;
         var s3upl = s3upload(filename,req);
     
         s3upl.then(async function (result) {
-            console.log(result,"result");
-            if (result && result['status'] == true) {
+
+            if (result && result['status']) {
 
               resolve({ "status": true, "message": "succesfully uploaded", filePath: result['filePath'] })
             }
