@@ -1,97 +1,161 @@
 import { IApplyEvent } from "../../interfaces/i-member-skills";
 import { ILoginInfo } from "../../interfaces/IUser.interface";
+import { Events } from "../../schema/events/events.schema";
 import { Participations } from "../../schema/participations/participations.schema";
+import EmailService from "../send.mail";
+import * as fs from 'fs'
+import * as path from 'path'
 
 class ParticipationsService {
 
-    public async applyEvent(userInformation: IApplyEvent):Promise<any> {
+    private emailService: EmailService;
+
+    constructor() {
+        this.emailService = new EmailService();
+    }
+
+    public async applyEvent(userInformation: IApplyEvent): Promise<any> {
         try {
 
             const checkAlreadyApplied = await this._isUserAlreadyAppliedForevent(
                 userInformation.userId, userInformation.eventId)
 
-                if(!checkAlreadyApplied){
-                    const participants = new Participations({
-                        userName: userInformation.userName,
-                        userId: userInformation.userId,
-                        eventId: userInformation.eventId,
-                        emailId: userInformation.emailId,
-                        status: 'Pending'
-                    });
-        
-                    return await participants.save();
-                }
+            if (!checkAlreadyApplied) {
+                const participants = new Participations({
+                    userName: userInformation.userName,
+                    userId: userInformation.userId,
+                    eventId: userInformation.eventId,
+                    emailId: userInformation.emailId,
+                    status: 'Pending'
+                });
 
-                throw new Error('You Already apply for this event, Please edit or apply for new Event')
+                return await participants.save();
+            }
 
-          
-        }catch(err){
+            throw new Error('You Already apply for this event, Please edit or apply for new Event')
+
+
+        } catch (err) {
             console.debug("Error occured in applyEvent");
             throw err;
         }
     }
 
-    public async getParticipant(userId: string | undefined, userInfo: ILoginInfo):Promise<any> {
+    public async getParticipant(userId: string | undefined, userInfo: ILoginInfo): Promise<any> {
         try {
-            
-            if(userId){
-                return await Participations.find({'userId': userId}).exec();
-            }else{
-               if( userInfo.userType === 'admin'){
-                   return await Participations.find().exec()
-               }
 
-               throw new Error('You are not allow to see all participant details')
+            if (userId) {
+                return await Participations.find({ 'userId': userId }).exec();
+            } else {
+                if (userInfo.userType === 'admin') {
+                    return await Participations.find().exec()
+                }
+
+                throw new Error('You are not allow to see all participant details')
             }
-        }catch(err){
+        } catch (err) {
             console.debug("Error occured in getParticipant");
             throw err;
         }
     }
 
-    public async approveParticipant(participantId: string , value: string):Promise<any> {
+    public async approveParticipant(participantId: string, value: string): Promise<any> {
         try {
-            
-            return await Participations.findOneAndUpdate(
-                {'_id': participantId},
+
+
+            const mailContent = await this._getMailInformation(participantId, value);
+
+            console.log('after ==', mailContent)
+            const result = await Participations.findOneAndUpdate(
+                { '_id': participantId },
                 {
                     $set: {
                         'status': value
                     }
                 }
-            ).exec();       
-            
-        }catch(err){
+            ).exec();
+
+
+            await this.emailService.sendMail(mailContent);
+
+            return result
+
+        } catch (err) {
             console.debug("Error occured in approveParticipant");
             throw err;
         }
     }
-    public async deleteParticipant(participantId: string ):Promise<any> {
+    public async deleteParticipant(participantId: string): Promise<any> {
         try {
-            
-            return await Participations.findOneAndDelete({"_id" : participantId }).exec();       
-            
-        }catch(err){
+
+            return await Participations.findOneAndDelete({ "_id": participantId }).exec();
+
+        } catch (err) {
             console.debug("Error occured in approveParticipant");
             throw err;
         }
     }
 
-    private async _isUserAlreadyAppliedForevent(userId: string, eventId: string):Promise<boolean> {
+    private async _isUserAlreadyAppliedForevent(userId: string, eventId: string): Promise<boolean> {
         try {
 
-            const dbResponse = await Participations.findOne({'userId': userId}).exec();
-            console.log('dbResponse ===', dbResponse, eventId, userId )
-            if(dbResponse && dbResponse['eventId'] === eventId){
+            const dbResponse = await Participations.findOne({ 'userId': userId }).exec();
+            console.log('dbResponse ===', dbResponse, eventId, userId)
+            if (dbResponse && dbResponse['eventId'] === eventId) {
 
                 return true
             }
-            
+
             return false
-        }catch(err){
+        } catch (err) {
             console.debug("Error occured in getEvents");
             throw err;
         }
+    }
+
+    private async _getMailInformation(participantId: string, value): Promise<any> {
+
+
+
+        return new Promise((resolve, reject) => {
+
+
+            const getParticipantDetails =  Participations.findOne({ '_id': participantId }).exec()
+
+            const getEventInfo =  Events.findOne({ '_id': getParticipantDetails['eventId'] }).exec()
+
+            let greetings = ``;
+
+            if (value.toUpperCase() === 'rejected') {
+
+                greetings = `We are  very sorry that your request to attend the event ${getEventInfo['competitionName'] ? getEventInfo['competitionName'] : ''}
+                is got rejected. Please try different event`
+
+            } else {
+                greetings = `We are  pleased to announce that your request to attend the event ${getEventInfo['competitionName'] ? getEventInfo['competitionName'] : ''}
+                is got approved.`
+            }
+
+            let bodyContent: any = fs.readFileSync(path.join(__dirname + '../../../config/mailTemplate.html'));
+
+            bodyContent = bodyContent.toString().replace('user_name', getParticipantDetails['userName'] ? getParticipantDetails['userName'] : '')
+                .replace('collection_name', greetings)
+
+
+            console.log('bodyContent', bodyContent)
+
+
+            console.log('bodyContent', bodyContent)
+           resolve({
+            // to: getParticipantDetails.emailId,
+            to: 'suriyathangaraman@gmail.com',
+            subject: getEventInfo['competitionName'],
+            html: bodyContent
+        })
+
+        })
+
+
     }
 }
 
