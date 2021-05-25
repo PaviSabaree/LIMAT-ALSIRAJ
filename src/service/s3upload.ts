@@ -1,19 +1,20 @@
 import { Readable } from "stream";
+import * as fs from "fs";
 
 var AWS = require('aws-sdk');
 AWS.config.region = 'ap-south-1';
 
-const utils =  (binary) => {
-    const readableInstanceStream = new Readable({
-        read() {
-            this.push(binary);
-            this.push(null);
-        }
-    });
+// const utils =  (binary) => {
+//     const readableInstanceStream = new Readable({
+//         read() {
+//             this.push(binary);
+//             this.push(null);
+//         }
+//     });
 
-    return readableInstanceStream;
+//     return readableInstanceStream;
 
-}
+// }
 
 
 export const s3upload =  async (fileName,req) => {
@@ -25,10 +26,12 @@ export const s3upload =  async (fileName,req) => {
         secretAccessKey: 'wAk23LCnxFuSY1OCF9MsSaQLby4eOjrOvl+LpcLF'
     });
 
+    const fileContent = fs.readFileSync(req.files[0].path);
+
     const s3params = {
         Bucket: 'alsiraj-s3-bucket-testing',
         Key: fileName, // File name you want to save as in S3
-        Body: utils(req.files.files.data),
+        Body: fileContent,
         ACL: 'public-read'
 
     };
@@ -39,6 +42,7 @@ export const s3upload =  async (fileName,req) => {
             if (err) {
                 resolve(outJson);
             }
+            fs.unlinkSync(req.files[0].path);
             outJson.status = true;
             outJson.filePath = s3data.Location;
             resolve(outJson);

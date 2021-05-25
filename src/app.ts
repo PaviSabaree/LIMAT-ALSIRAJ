@@ -2,6 +2,9 @@ import { DBConnection } from './config/constant.enum'
 import * as express from 'express'
 import * as mongodb from 'mongoose'
 var cors = require('cors')
+var multer = require('multer')
+
+const upload = multer({ dest: `upload/` })
 class App {
     public app: express.Application
     public port: number
@@ -9,6 +12,7 @@ class App {
     constructor(appInit: { port: number; middleWares: any; controllers: any;}) {
         this.app = express()
         this.app.use(cors())
+        this.app.use(upload.any())
         this.port = appInit.port
         this.middlewares(appInit.middleWares)
         this.routes(appInit.controllers)
@@ -61,3 +65,4 @@ class App {
 }
 
 export default App
+

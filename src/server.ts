@@ -12,6 +12,7 @@ import MemberSkillRoute from './routes/skills/member-skill.route';
 import EventRoutes from './routes/events/event.route';
 import ParticipationsRoute from './routes/participations/participations.route';
 
+
 const server: express.Application = express();
 
 const swaggerDocument = YAML.load('docs/swagger.yaml');

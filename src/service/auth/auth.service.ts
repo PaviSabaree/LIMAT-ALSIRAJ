@@ -125,18 +125,14 @@ class AuthService {
       })
     }
 
-/*     public async uploadFileToS3(req: any): Promise<any> {
+    public async uploadFileToS3(req: any): Promise<any> {
 
       return new Promise((resolve, reject)=> { 
 
-        console.log('request =====', req)
-
         console.log('request2 =====', req.files)
 
-        console.log('request3 =====', req.body)
-
         var dateObj = new Date().toLocaleDateString().split('/');
-        var filename = process.env.NODE_ENV + "/userupload/" + dateObj.join('') + "/" + req.files.name.replace(' ', '').replace(' ', '').replace(' ', '').replace(' ', '').replace('%20', '').replace('%20', '');
+        var filename = "userupload/" + dateObj.join('') + "/" + req.files[0].originalname;
         var s3upl = s3upload(filename,req);
     
         s3upl.then(async function (result) {
@@ -156,7 +152,7 @@ class AuthService {
           
 
         })
-    } */
+    } 
 
 
     private async _checkExistinguser(userInformation: IUserInformation) {
