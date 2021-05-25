@@ -13,9 +13,6 @@ class EmailService {
         }
       });
 
-      console.log('mailOptions ===', mailOptions)
-    
-
       transporter.sendMail(mailOptions, (error: any, info: any) => {
         if (error) {
           console.error(`Email failed and the reson is :  ${error.message}`);

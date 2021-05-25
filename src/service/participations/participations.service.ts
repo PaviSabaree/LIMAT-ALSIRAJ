@@ -115,18 +115,15 @@ class ParticipationsService {
 
     private async _getMailInformation(participantId: string, value): Promise<any> {
 
+        return new Promise(async (resolve, reject) => {
 
 
-        return new Promise((resolve, reject) => {
-
-
-            const getParticipantDetails =  Participations.findOne({ '_id': participantId }).exec()
-
-            const getEventInfo =  Events.findOne({ '_id': getParticipantDetails['eventId'] }).exec()
+            const getParticipantDetails = await Participations.findOne({ '_id': participantId }).exec()
+            const getEventInfo = await Events.findOne({ '_id': getParticipantDetails['eventId'] }).exec()
 
             let greetings = ``;
 
-            if (value.toUpperCase() === 'rejected') {
+            if (value.toUpperCase() === 'REJECTED') {
 
                 greetings = `We are  very sorry that your request to attend the event ${getEventInfo['competitionName'] ? getEventInfo['competitionName'] : ''}
                 is got rejected. Please try different event`
@@ -136,16 +133,11 @@ class ParticipationsService {
                 is got approved.`
             }
 
-            let bodyContent: any = fs.readFileSync(path.join(__dirname + '../../../config/mailTemplate.html'));
+            let bodyContent: any =await fs.readFileSync(path.join(__dirname + '../../../config/mailTemplate.html'));
 
             bodyContent = bodyContent.toString().replace('user_name', getParticipantDetails['userName'] ? getParticipantDetails['userName'] : '')
                 .replace('collection_name', greetings)
 
-
-            console.log('bodyContent', bodyContent)
-
-
-            console.log('bodyContent', bodyContent)
            resolve({
             // to: getParticipantDetails.emailId,
             to: 'suriyathangaraman@gmail.com',

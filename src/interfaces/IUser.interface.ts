@@ -26,3 +26,10 @@ export interface ILoginInfo{
         userType?: string
    
 }
+
+export interface IEmailInfo{
+        emailId: string,
+        subject: string,
+        emailBody: string
+   
+}

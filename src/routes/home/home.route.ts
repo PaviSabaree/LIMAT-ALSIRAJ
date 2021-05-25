@@ -12,6 +12,7 @@ class HomeRoute  {
     constructor() {
         this.router.get('/masters/any/users/list', authenticateToken, this.getUsers);
         this.router.get('/masters/any/admin/list', authenticateToken, this.getAdmins);
+        this.router.post('/masters/any/email/add', authenticateToken, this._sendMail)
         this.service = new Service();
 
     }
@@ -39,6 +40,27 @@ class HomeRoute  {
             const result =await this.service.getAdmins(req.user);
           
             res.json(result);   
+        } catch (err) {
+             console.log("Error occured in getting admin list",err);
+
+                res.status(400).json({
+                    message: err.toString()
+                }); 
+        }
+
+    }
+
+    private  _sendMail = async (req: IRequestExtended, res: express.Response, next) => {
+
+        try {
+            await this.service.sendMail(req.body);
+
+            const response = {
+                status : 200,
+                message: `SucessFully sent mail to ${req.body.emailId}` 
+            }
+          
+            res.json(response);   
         } catch (err) {
              console.log("Error occured in getting admin list",err);
 

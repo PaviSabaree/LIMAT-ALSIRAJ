@@ -1,7 +1,14 @@
 import { UserSchema } from "../schema/user.schema";
 import * as jwt from "jsonwebtoken";
-import { ILoginInfo, IUserInformation } from "../interfaces/IUser.interface";
+import { IEmailInfo, ILoginInfo, IUserInformation } from "../interfaces/IUser.interface";
+import EmailService from "./send.mail";
 class Service {
+
+  private mailService : EmailService;
+  constructor(){
+    this.mailService = new EmailService();
+  }
+
   /* function to create new User */
   public async signUp(userInformation: IUserInformation): Promise<any> {
     try {
@@ -72,6 +79,26 @@ class Service {
       } catch (error) {
         
         console.log('error while getting user list from db ', error )
+
+        throw error
+      }   
+    }
+
+    public async sendMail(emailInfo: IEmailInfo): Promise<any> {
+
+      try {
+
+       const mailOption = {
+        to: emailInfo.emailId,
+        subject: emailInfo.subject,
+        text: emailInfo.emailBody
+       }
+
+       return await this.mailService.sendMail(mailOption);
+           
+      } catch (error) {
+        
+        console.log('error while sendMail ', error )
 
         throw error
       }   
