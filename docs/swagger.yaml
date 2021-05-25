@@ -26,7 +26,9 @@ tags:
   - name: 'Skills'
     description: __Rest API's to get all information releated to competitions.__
   - name: 'Participants'
-    description: __Rest API's to get all information releated to participants.__     
+    description: __Rest API's to get all information releated to participants.__
+  - name: 'Email'
+    description: __Rest API's to send any email to participants.__    
 schemes:
   - http
   - https
@@ -69,6 +71,65 @@ paths:
         - 'application/json'
       produces:
         - 'application/json'
+  /masters/any/email/add:
+    post:
+      tags:
+        - 'Email'
+      summary: To send email for any users
+      operationId: _sendMail
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/EmailInput'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'        
+  /auth/upload:
+    post:
+      tags:
+        - 'SignUp'
+      summary: To upload any files to bucket and get new Url
+      operationId: _upload
+      parameters:
+         - in: formData
+           name: upfile
+           type: file
+           description: The file to upload.
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: 'object'
+            properties:
+              data:
+                $ref: '#/definitions/GenralResponse'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: To add new Skill fpr users
+      consumes:
+        - multipart/form-data
+      produces:
+        - 'application/json'        
   /masters/any/userparticipant/add:
     post:
       tags:
@@ -536,6 +597,15 @@ definitions:
         type: string
       status:
         type: string
+  EmailInput:
+    type: object
+    properties:
+      emailId:
+        type: string
+      subject:
+        type: string 
+      emailBody:
+        type: string         
   AddParticipantsInput:
     type: object
     properties:
