@@ -73,13 +73,21 @@ class AuthRoute  {
     private _getAuthToken = async (req: express.Request, res: express.Response) => {
         try {
 
-            const accessToken = await this.authService.getAccessToken(req.body.token);
+            const tokens = await this.authService.getAccessToken(req.body.token);
 
-            if(!accessToken && accessToken === undefined) {
+            if(!tokens && tokens === undefined) {
                 throw new Error('unable to get access token');
             }
 
-            res.json({ accessToken :  accessToken });  
+            const response  ={
+                status: true,
+                msg: 'new token created successfully',
+                refreshtoken:  tokens.refreshToken ,
+                token :  tokens.accessToken
+
+            }
+
+            res.json(response);  
 
         }catch(err){
             console.log("Error occured in _signIn",err);

@@ -103,6 +103,7 @@ class AuthService {
       return new Promise((resolve, reject)=> { 
 
         let accessToken = '';
+        let refreshToken = ''
 
         if (token == null && !this.refreshTokens.includes(token)){
             throw new Error('not a valid token');
@@ -120,7 +121,13 @@ class AuthService {
             userType:user.userType
           })
 
-          resolve(accessToken)
+          refreshToken=  await this._generateRefreshToken({
+            emailId: user.emailId,
+            password:user.password,
+            userType:user.userType
+          });
+
+          resolve({accessToken, refreshToken})
         })
       })
     }
