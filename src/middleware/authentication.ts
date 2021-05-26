@@ -8,12 +8,13 @@ const authenticateToken = (req: IRequestExtended, resp: Response, next) => {
 
     console.log('came to auth')
     const authHeader = req.headers['authorization']
-    const token = authHeader
+    const token = authHeader && authHeader.split(' ')[1]
+    console.log(token)
     if (token == null){
       return resp.sendStatus(401)
     } 
   
-    jwt.verify(authHeader, process.env.ACCESS_TOKEN_SECRET, (err: any, user: any) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err: any, user: any) => {
       console.log(err)
 
       
