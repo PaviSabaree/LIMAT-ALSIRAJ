@@ -10,7 +10,7 @@ class EventRoutes {
         this.router.post('/masters/any/competition/add', authenticateToken,this._addEvent);
         this.router.put('/masters/any/competition/edit/:id',authenticateToken, this._editEvent);
         this.router.delete('/masters/any/competition/delete/:id', authenticateToken,this._deleteEvent);
-        this.router.get('/masters/any/competition/list',authenticateToken, this._getEvents);
+        this.router.get('/masters/any/competition/list', this._getEvents);
         this.service = new EventService()
 
     }

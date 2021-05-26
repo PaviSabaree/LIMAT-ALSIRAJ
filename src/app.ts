@@ -9,9 +9,9 @@ import * as cors from 'cors'
 const upload = multer({ dest: `upload/` })
 class App {
     public app: express.Application
-    public port: number
+    public port: number | string
 
-    constructor(appInit: { port: number; middleWares: any; controllers: any;}) {
+    constructor(appInit: { port: number | string; middleWares: any; controllers: any;}) {
         this.app = express()
         this.app.use(cors())
         this.app.use(upload.any())
