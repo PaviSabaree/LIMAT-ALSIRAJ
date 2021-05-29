@@ -36,8 +36,26 @@ class AuthService {
           documentUrl: userInformation.documentUrl,
           socialAuth: userInformation.socialAuth? true : false
         });
+
+        const result = await user.save();
+
+        const tokenInfo : ILoginInfo = {
+          emailId: userInformation.emailId,
+          password: userInformation.password,
+          userType: userInformation.userType,
+        }
+
+        const token = await this._generateAccessToken(tokenInfo);
+        const refreshtoken = await this._generateRefreshToken(tokenInfo);
   
-        return await user.save();
+        return {
+          result,
+          data: {
+            status: true,
+            token,
+            refreshtoken,
+          }
+        }
       }
 
 
