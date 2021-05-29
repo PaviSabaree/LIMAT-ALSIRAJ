@@ -13,6 +13,10 @@ const  ParticipationsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    eventName: {
+        type: String,
+        required: true
+    },
     status: {
         type: String,
         required: true

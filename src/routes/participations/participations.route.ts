@@ -74,8 +74,9 @@ class ParticipationsRoute {
     private  _approveParticipant = async (req: IRequestExtended, res: express.Response, next) => {
 
         try {
-
-            const approveParticipants = await this.service.approveParticipant(req.params.id, req.params.value);
+            const comments = req.body.comments
+            const approveParticipants = await this.service.
+            approveParticipant(req.params.id, req.params.value, comments);
             
             if(!approveParticipants && approveParticipants === undefined){
                 throw new Error('unable to save member skill set');

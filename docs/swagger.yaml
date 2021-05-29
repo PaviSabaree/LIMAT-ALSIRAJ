@@ -613,6 +613,8 @@ definitions:
         type: string
       eventId:
         type: string
+      eventName:
+        type: string  
       userId:
         type: string
       emailId:
@@ -652,7 +654,7 @@ definitions:
       endDate:
         type: string
       description:
-        type: number
+        type: string
   SkillInputInformation:
     type: object
     properties:

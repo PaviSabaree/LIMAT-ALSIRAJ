@@ -20,13 +20,20 @@ class ParticipationsService {
             const checkAlreadyApplied = await this._isUserAlreadyAppliedForevent(
                 userInformation.userId, userInformation.eventId)
 
+            const eventInformation: any = await Events.findOne({'_id': userInformation.eventId}).exec()  
+            
+            if(eventInformation['status']!=="active"){
+                throw new Error('The Competition is not in active currently. Please apply for some other competition')
+            }
+
             if (!checkAlreadyApplied) {
                 const participants = new Participations({
                     userName: userInformation.userName,
                     userId: userInformation.userId,
                     eventId: userInformation.eventId,
                     emailId: userInformation.emailId,
-                    status: 'Pending'
+                    eventName:eventInformation.eventName,
+                    status: 'PENDING'
                 });
 
                 return await participants.save();
@@ -59,11 +66,11 @@ class ParticipationsService {
         }
     }
 
-    public async approveParticipant(participantId: string, value: string): Promise<any> {
+    public async approveParticipant(participantId: string, value: string, comments: string): Promise<any> {
         try {
 
 
-            const mailContent = await this._getMailInformation(participantId, value);
+            const mailContent = await this._getMailInformation(participantId, value, comments);
 
             console.log('after ==', mailContent)
             const result = await Participations.findOneAndUpdate(
@@ -113,7 +120,7 @@ class ParticipationsService {
         }
     }
 
-    private async _getMailInformation(participantId: string, value): Promise<any> {
+    private async _getMailInformation(participantId: string, value, comments?: string): Promise<any> {
 
         return new Promise(async (resolve, reject) => {
 
@@ -128,15 +135,19 @@ class ParticipationsService {
                 greetings = `We are  very sorry that your request to attend the event ${getEventInfo['competitionName'] ? getEventInfo['competitionName'] : ''}
                 is got rejected. Please try different event`
 
-            } else {
+            } else if(value.toUpperCase() === 'APPROVED'){
                 greetings = `We are  pleased to announce that your request to attend the event ${getEventInfo['competitionName'] ? getEventInfo['competitionName'] : ''}
                 is got approved.`
+            }
+            else if(value.toUpperCase() === 'HOLD'){
+                greetings = `We are  pleased to announce that your request to attend the event ${getEventInfo['competitionName'] ? getEventInfo['competitionName'] : ''}
+                is got Hold by our team. Please wait we check your information again.`
             }
 
             let bodyContent: any =await fs.readFileSync(path.join(__dirname + '../../../config/mailTemplate.html'));
 
             bodyContent = bodyContent.toString().replace('user_name', getParticipantDetails['userName'] ? getParticipantDetails['userName'] : '')
-                .replace('collection_name', greetings)
+                .replace('collection_name', greetings? greetings:'').replace('comments',comments? comments: '')
 
            resolve({
             // to: getParticipantDetails.emailId,
