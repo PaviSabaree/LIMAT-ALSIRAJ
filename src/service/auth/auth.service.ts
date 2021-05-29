@@ -14,12 +14,27 @@ class AuthService {
 
       const checkExistingUser = await this._checkExistinguser(userInformation)
 
+      const tokenInfo : ILoginInfo = {
+        emailId: userInformation.emailId,
+        password: userInformation.password,
+        userType: userInformation.userType,
+      }
+
+      const token = await this._generateAccessToken(tokenInfo);
+      const refreshtoken = await this._generateRefreshToken(tokenInfo);
+
       console.log('db user value ==', checkExistingUser)
 
       if(checkExistingUser){
         if(userInformation.socialAuth){
-
-          return checkExistingUser
+          return {
+            checkExistingUser,
+            data: {
+              status: true,
+              token,
+              refreshtoken,
+            }
+          }
         }else{
           throw new Error('User Already Exist with this mail Id, Please user different user or use forget passoword')
         }
@@ -39,24 +54,23 @@ class AuthService {
 
         const result = await user.save();
 
-        const tokenInfo : ILoginInfo = {
-          emailId: userInformation.emailId,
-          password: userInformation.password,
-          userType: userInformation.userType,
+        if(userInformation.socialAuth){
+
+    
+          return {
+            result,
+            data: {
+              status: true,
+              token,
+              refreshtoken,
+            }
+          }
+        }else{
+          return result
+        }
         }
 
-        const token = await this._generateAccessToken(tokenInfo);
-        const refreshtoken = await this._generateRefreshToken(tokenInfo);
-  
-        return {
-          result,
-          data: {
-            status: true,
-            token,
-            refreshtoken,
-          }
-        }
-      }
+
 
 
     } catch (err) {
