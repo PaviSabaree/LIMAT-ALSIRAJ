@@ -22,7 +22,7 @@ class ParticipationsService {
 
             const eventInformation: any = await Events.findOne({'_id': userInformation.eventId}).exec()  
             
-            if(eventInformation['status']!=="active"){
+            if(eventInformation['status'].toUpperCase()!=="ACTIVE"){
                 throw new Error('The Competition is not in active currently. Please apply for some other competition')
             }
 
