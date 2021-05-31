@@ -5,6 +5,7 @@ import { Participations } from "../../schema/participations/participations.schem
 import EmailService from "../send.mail";
 import * as fs from 'fs'
 import * as path from 'path'
+import { mailTemplate } from "../mailTemplate.html";
 
 class ParticipationsService {
 
@@ -70,8 +71,8 @@ class ParticipationsService {
     public async approveParticipant(participantId: string, value: string, comments: string): Promise<any> {
         try {
 
-
-            const mailContent = await this._getMailInformation(participantId, value, comments);
+            const participant = await Participations.findOne({'_id':participantId})
+            const mailContent = await this._getMailInformation(participantId, value, participant['emailId'],comments);
 
             console.log('after ==', mailContent)
             const result = await Participations.findOneAndUpdate(
@@ -121,7 +122,8 @@ class ParticipationsService {
         }
     }
 
-    private async _getMailInformation(participantId: string, value, comments?: string): Promise<any> {
+    private async _getMailInformation(participantId: string, value,
+        toEmail: string,  comments?: string,): Promise<any> {
 
         return new Promise(async (resolve, reject) => {
 
@@ -145,14 +147,14 @@ class ParticipationsService {
                 is got Hold by our team. Please wait we check your information again.`
             }
 
-            let bodyContent: any =await fs.readFileSync(path.join(__dirname + '../../../config/mailTemplate.html'));
+            let bodyContent: string = mailTemplate
 
             bodyContent = bodyContent.toString().replace('user_name', getParticipantDetails['userName'] ? getParticipantDetails['userName'] : '')
                 .replace('collection_name', greetings? greetings:'').replace('comments',comments? comments: '')
 
            resolve({
             // to: getParticipantDetails.emailId,
-            to: 'suriyathangaraman@gmail.com',
+            to: toEmail,
             subject: getEventInfo['competitionName'],
             html: bodyContent
         })

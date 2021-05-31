@@ -2,7 +2,7 @@ import * as nodemailer from 'nodemailer';
 
 
 class EmailService {
-  public sendMail = (mailOptions) => {
+  public  async sendMail(mailOptions) : Promise<any>{
     try {
      
       const transporter = nodemailer.createTransport({

@@ -1,11 +1,9 @@
-<!DOCTYPE html>
+export const mailTemplate =`<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
     <meta charset="utf-8" />
     <title>Email</title>
 </head>
-
 <body style="font-family: Arial, Helvetica, sans-serif; margin: 0 !important; font-size: 15px; line-height: 20px;">
     <table cellspacing="0" cellpadding="0" border="0" align="center"
         style="width:600px; padding: 20px; box-shadow: 0 0 5px 0 #ddd; border-top: 5px solid #0e0e0e; border-bottom: 5px solid #0e0e0e; background: #ffffff;">
@@ -50,4 +48,4 @@
     </table>
 </body>
 
-</html>
+</html>`
