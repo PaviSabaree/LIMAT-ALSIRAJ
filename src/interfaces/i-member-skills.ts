@@ -10,5 +10,6 @@ export interface IMemberSkills {
 export interface IApplyEvent extends IMemberSkills{
     eventId : string 
     status: string
+    eventName: string
 }
 

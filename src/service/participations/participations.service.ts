@@ -32,7 +32,7 @@ class ParticipationsService {
                     userId: userInformation.userId,
                     eventId: userInformation.eventId,
                     emailId: userInformation.emailId,
-                    eventName:eventInformation.eventName,
+                    eventName:userInformation.eventName,
                     status: 'PENDING'
                 });
 
