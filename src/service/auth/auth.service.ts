@@ -12,7 +12,7 @@ class AuthService {
   public async signUp(userInformation: IUserInformation): Promise<any> {
     try {
 
-      const checkExistingUser = await this._checkExistinguser(userInformation)
+      const checkExistingUser = await this._checkExistinguser(userInformation.emailId)
 
       const tokenInfo : ILoginInfo = {
         emailId: userInformation.emailId,
@@ -25,7 +25,27 @@ class AuthService {
 
       console.log('db user value ==', checkExistingUser)
 
+
       if(checkExistingUser){
+        if(userInformation.socialAuth && userInformation.userType){
+
+          const dbResponse = await UserSchema.findOneAndUpdate({'emailId': userInformation.emailId},
+          {
+            $set: {
+                'userType': userInformation.userType
+            }
+        }).exec()
+
+        return {
+          'checkExistingUser': dbResponse,
+          data: {
+            status: true,
+            token,
+            refreshtoken,
+          }
+        }
+
+        }
         if(userInformation.socialAuth){
           return {
             checkExistingUser,
@@ -79,6 +99,8 @@ class AuthService {
       throw err
     }
   }
+
+
 
     /* function to Login and get accessToken and RefreshToken */
     public async signIn(userInformation: ILoginInfo): Promise<any> {
@@ -192,9 +214,9 @@ class AuthService {
     } 
 
 
-    private async _checkExistinguser(userInformation: IUserInformation) {
+    private async _checkExistinguser(emailId: string) {
      
-      const dbResponse = await UserSchema.findOne({'emailId': userInformation.emailId}).exec()
+      const dbResponse = await UserSchema.findOne({'emailId': emailId}).exec()
 
       return dbResponse
     }
