@@ -33,7 +33,8 @@ class ParticipationsService {
                     eventId: userInformation.eventId,
                     emailId: userInformation.emailId,
                     eventName:userInformation.eventName,
-                    status: 'PENDING'
+                    status: 'PENDING',
+                    eventInfo:userInformation.eventId
                 });
 
                 return await participants.save();
@@ -52,10 +53,10 @@ class ParticipationsService {
         try {
 
             if (userId) {
-                return await Participations.find({ 'userId': userId }).exec();
+                return await Participations.find({ 'userId': userId }).populate('eventInfo').exec();
             } else {
                 if (userInfo.userType === 'admin') {
-                    return await Participations.find().exec()
+                    return await Participations.find().populate('eventInfo').exec()
                 }
 
                 throw new Error('You are not allow to see all participant details')

@@ -25,7 +25,11 @@ const  ParticipationsSchema = new mongoose.Schema({
         type: String,
         required: true,
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
-    }
+    },
+    eventInfo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "EventsSchema"
+      }
 });
 
 export const Participations= mongoose.model('Participations', ParticipationsSchema );
