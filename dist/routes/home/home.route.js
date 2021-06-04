@@ -55,22 +55,9 @@ class HomeRoute {
                 });
             }
         });
-        this._buy = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const resp = yield this.service.subscriptions(req, res);
-                return resp;
-            }
-            catch (err) {
-                console.log("Error occured in _buy", err);
-                res.status(400).json({
-                    message: err.toString()
-                });
-            }
-        });
         this.router.get('/masters/any/users/list', authentication_1.default, this.getUsers);
         this.router.get('/masters/any/admin/list', authentication_1.default, this.getAdmins);
         this.router.post('/masters/any/email/add', authentication_1.default, this._sendMail);
-        this.router.get('/buy', this._buy);
         this.service = new service_1.default();
     }
 }

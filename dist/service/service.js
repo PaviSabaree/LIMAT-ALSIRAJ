@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_schema_1 = require("../schema/user.schema");
 const jwt = require("jsonwebtoken");
 const send_mail_1 = require("./send.mail");
-const paypal = require("paypal-rest-sdk");
 class Service {
     constructor() {
         this.mailService = new send_mail_1.default();
@@ -115,55 +114,6 @@ class Service {
             }
         });
     }
-    subscriptions(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const create_payment_json = {
-                "intent": "sale",
-                "payer": {
-                    "payment_method": "paypal"
-                },
-                "redirect_urls": {
-                    "return_url": "http://localhost:8000/success",
-                    "cancel_url": "http://localhost:8000/cancel"
-                },
-                "transactions": [{
-                        "item_list": {
-                            "items": [{
-                                    "name": "Alsiraj membership",
-                                    "sku": "001",
-                                    "price": "5.00",
-                                    "currency": "USD",
-                                    "quantity": 1
-                                }]
-                        },
-                        "amount": {
-                            "currency": "USD",
-                            "total": "5.00"
-                        },
-                        "description": "Hat for the best team ever"
-                    }]
-            };
-            console.log('payment', create_payment_json);
-            // call the create Pay method 
-            yield this.createPayment(create_payment_json)
-                .then((transaction) => {
-                console.log('transaction', transaction);
-                var id = transaction['id'];
-                var links = transaction['links'];
-                var counter = links.length;
-                while (counter--) {
-                    if (links[counter].method == 'REDIRECT') {
-                        // redirect to paypal where user approves the transaction 
-                        return res.redirect(links[counter].href);
-                    }
-                }
-            })
-                .catch((err) => {
-                console.log(err);
-                res.redirect('/err');
-            });
-        });
-    }
     generateAccessToken(user) {
         return __awaiter(this, void 0, void 0, function* () {
             return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
@@ -172,20 +122,6 @@ class Service {
     generateRefreshToken(user) {
         return __awaiter(this, void 0, void 0, function* () {
             return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30m' });
-        });
-    }
-    createPayment(payment) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                paypal.payment.create(payment, function (err, payment) {
-                    if (err) {
-                        reject(err);
-                    }
-                    else {
-                        resolve(payment);
-                    }
-                });
-            });
         });
     }
 }

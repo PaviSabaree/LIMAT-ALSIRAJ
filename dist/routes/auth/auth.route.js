@@ -83,6 +83,7 @@ class AuthRoute {
             }
         });
         this.router.post('/masters/any/users/add', this._signup);
+        this.router.post('/masters/any/update/user', this._signup);
         this.router.post('/auth/signin', this._signIn);
         this.router.post('/auth/getAuthToken', this._getAuthToken);
         this.router.post('/auth/upload', this._upload);

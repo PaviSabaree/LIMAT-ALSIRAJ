@@ -22,7 +22,7 @@ class AuthService {
     signUp(userInformation) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const checkExistingUser = yield this._checkExistinguser(userInformation);
+                const checkExistingUser = yield this._checkExistinguser(userInformation.emailId);
                 const tokenInfo = {
                     emailId: userInformation.emailId,
                     password: userInformation.password,
@@ -32,6 +32,21 @@ class AuthService {
                 const refreshtoken = yield this._generateRefreshToken(tokenInfo);
                 console.log('db user value ==', checkExistingUser);
                 if (checkExistingUser) {
+                    if (userInformation.socialAuth && userInformation.userType) {
+                        const dbResponse = yield user_schema_1.UserSchema.findOneAndUpdate({ 'emailId': userInformation.emailId }, {
+                            $set: {
+                                'userType': userInformation.userType
+                            }
+                        }).exec();
+                        return {
+                            'checkExistingUser': dbResponse,
+                            data: {
+                                status: true,
+                                token,
+                                refreshtoken,
+                            }
+                        };
+                    }
                     if (userInformation.socialAuth) {
                         return {
                             checkExistingUser,
@@ -170,9 +185,9 @@ class AuthService {
             });
         });
     }
-    _checkExistinguser(userInformation) {
+    _checkExistinguser(emailId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dbResponse = yield user_schema_1.UserSchema.findOne({ 'emailId': userInformation.emailId }).exec();
+            const dbResponse = yield user_schema_1.UserSchema.findOne({ 'emailId': emailId }).exec();
             return dbResponse;
         });
     }

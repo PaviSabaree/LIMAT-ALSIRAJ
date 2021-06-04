@@ -12,8 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const events_schema_1 = require("../../schema/events/events.schema");
 const participations_schema_1 = require("../../schema/participations/participations.schema");
 const send_mail_1 = require("../send.mail");
-const fs = require("fs");
-const path = require("path");
+const mailTemplate_html_1 = require("../mailTemplate.html");
 class ParticipationsService {
     constructor() {
         this.emailService = new send_mail_1.default();
@@ -23,7 +22,7 @@ class ParticipationsService {
             try {
                 const checkAlreadyApplied = yield this._isUserAlreadyAppliedForevent(userInformation.userId, userInformation.eventId);
                 const eventInformation = yield events_schema_1.Events.findOne({ '_id': userInformation.eventId }).exec();
-                if (eventInformation['status'] !== "active") {
+                if (eventInformation['status'].toUpperCase() !== "ACTIVE") {
                     throw new Error('The Competition is not in active currently. Please apply for some other competition');
                 }
                 if (!checkAlreadyApplied) {
@@ -32,8 +31,9 @@ class ParticipationsService {
                         userId: userInformation.userId,
                         eventId: userInformation.eventId,
                         emailId: userInformation.emailId,
-                        eventName: eventInformation.eventName,
-                        status: 'PENDING'
+                        eventName: userInformation.eventName,
+                        status: 'PENDING',
+                        eventInfo: userInformation.eventId
                     });
                     return yield participants.save();
                 }
@@ -49,11 +49,11 @@ class ParticipationsService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 if (userId) {
-                    return yield participations_schema_1.Participations.find({ 'userId': userId }).exec();
+                    return yield participations_schema_1.Participations.find({ 'userId': userId }).populate('eventInfo').exec();
                 }
                 else {
                     if (userInfo.userType === 'admin') {
-                        return yield participations_schema_1.Participations.find().exec();
+                        return yield participations_schema_1.Participations.find().populate('eventInfo').exec();
                     }
                     throw new Error('You are not allow to see all participant details');
                 }
@@ -67,7 +67,8 @@ class ParticipationsService {
     approveParticipant(participantId, value, comments) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const mailContent = yield this._getMailInformation(participantId, value, comments);
+                const participant = yield participations_schema_1.Participations.findOne({ '_id': participantId });
+                const mailContent = yield this._getMailInformation(participantId, value, participant['emailId'], comments);
                 console.log('after ==', mailContent);
                 const result = yield participations_schema_1.Participations.findOneAndUpdate({ '_id': participantId }, {
                     $set: {
@@ -110,7 +111,7 @@ class ParticipationsService {
             }
         });
     }
-    _getMailInformation(participantId, value, comments) {
+    _getMailInformation(participantId, value, toEmail, comments) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 const getParticipantDetails = yield participations_schema_1.Participations.findOne({ '_id': participantId }).exec();
@@ -128,12 +129,12 @@ class ParticipationsService {
                     greetings = `We are  pleased to announce that your request to attend the event ${getEventInfo['competitionName'] ? getEventInfo['competitionName'] : ''}
                 is got Hold by our team. Please wait we check your information again.`;
                 }
-                let bodyContent = yield fs.readFileSync(path.join(__dirname + '../../../config/mailTemplate.html'));
+                let bodyContent = mailTemplate_html_1.mailTemplate;
                 bodyContent = bodyContent.toString().replace('user_name', getParticipantDetails['userName'] ? getParticipantDetails['userName'] : '')
                     .replace('collection_name', greetings ? greetings : '').replace('comments', comments ? comments : '');
                 resolve({
                     // to: getParticipantDetails.emailId,
-                    to: 'suriyathangaraman@gmail.com',
+                    to: toEmail,
                     subject: getEventInfo['competitionName'],
                     html: bodyContent
                 });
