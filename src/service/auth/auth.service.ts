@@ -4,10 +4,20 @@ import * as bcrypt from 'bcrypt'
 import {s3upload} from "../s3upload"
 import { ILoginInfo, IUserInformation } from "../../interfaces/IUser.interface";
 import { UserSchema } from "../../schema/user.schema";
+import EmailService from "../send.mail";
+import { reqResetPwd } from "../../templates/request-reset-password.html";
+import { resetPwdSucces } from "../../templates/reset-password.html";
+import { ClienUrl } from "../../config/constant.enum"
 
 class AuthService {
-    
-    protected refreshTokens = [];
+
+  private mailService : EmailService;
+  protected refreshTokens = [];
+
+  constructor(){
+    this.mailService = new EmailService();
+  }
+
   /* function to create new User */
   public async signUp(userInformation: IUserInformation): Promise<any> {
     try {
@@ -213,10 +223,105 @@ class AuthService {
         })
     } 
 
+    public async pwdResetRequest(emailId: string): Promise<any> {
+      try {       
+
+        const userInfo = await this._checkExistinguser(emailId);      
+
+        if(!userInfo){
+          throw new Error('User does not exist');
+        }
+        const tokenInfo : ILoginInfo = {
+          emailId: userInfo.emailId,
+          password: userInfo.password,
+          userType: userInfo.userType,
+        }
+
+          const resetToken = await this._generateAccessToken(tokenInfo);
+
+          const link = `${ClienUrl.clientURL}/passwordReset?token=${resetToken}&id=${userInfo._id}`;
+
+          let bodyContent: string = reqResetPwd;
+
+          bodyContent = bodyContent.toString().replace('_name',userInfo.userName).replace('_link', link);
+
+          console.log(bodyContent)
+
+          const mailOption = {
+            to: emailId,
+            subject: "Password Reset Request",
+            html: bodyContent
+           }
+
+          return this.mailService.sendMail(mailOption);
+        
+
+        
+      } catch (err) {
+        console.log("Exception occured in pwdResetRequest", err);
+  
+        throw err
+      }
+    }
+
+    public async pwdReset(pwdRequest): Promise<any> {
+      try{
+
+        const isValid = await this._verifyToken(pwdRequest.token);
+
+        if (!isValid) {
+          throw new Error("Invalid or expired token");
+        }
+
+        const salt = await bcrypt.genSalt(5);
+        const hashPassword = await bcrypt.hash(pwdRequest.password, salt);
+
+      await UserSchema.updateOne(
+          { _id: pwdRequest.userId },
+          { $set: { password: hashPassword } },
+          { new: true }
+        );
+
+      const user = await UserSchema.findById({ _id: pwdRequest.userId });
+
+      let bodyContent:string = resetPwdSucces;
+
+      bodyContent = bodyContent.toString().replace('_name', user.userName);
+
+
+      const mailOption = {
+        to: user.emailId,
+        subject: "Password Reset Successfully",
+        html: bodyContent
+       }
+
+       return await this.mailService.sendMail(mailOption);
+
+      } catch(error){
+        console.log("Exception occured in pwdReset", error);
+  
+        throw error
+      }
+    }
+
+    private async _verifyToken(token: string): Promise<boolean> {
+      let isValidToken = false;
+
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err: any, user: any) => {
+        if(err){
+          throw err;
+        }
+        isValidToken = true;
+      });
+
+      return isValidToken;
+    }
 
     private async _checkExistinguser(emailId: string) {
      
       const dbResponse = await UserSchema.findOne({'emailId': emailId}).exec()
+
+      console.log(dbResponse)
 
       return dbResponse
     }
