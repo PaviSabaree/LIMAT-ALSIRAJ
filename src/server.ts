@@ -11,6 +11,7 @@ import AuthRoute from './routes/auth/auth.route'
 import MemberSkillRoute from './routes/skills/member-skill.route';
 import EventRoutes from './routes/events/event.route';
 import ParticipationsRoute from './routes/participations/participations.route';
+import SubscriptionRoute from './routes/subscription/subscription.route';
 
 
 const server: express.Application = express();
@@ -30,7 +31,8 @@ const app = new App({
         new AuthRoute(),
         new MemberSkillRoute(),
         new EventRoutes(),
-        new ParticipationsRoute()
+        new ParticipationsRoute(),
+        new SubscriptionRoute()
     ],
 })
 
