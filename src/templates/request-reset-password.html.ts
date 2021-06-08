@@ -5,10 +5,11 @@ export const reqResetPwd = `<!DOCTYPE html>
     <title>Email</title>
 </head>
 <body>
-    <p>Hi _name,</p>
-    <p>You requested to reset your password.</p>
-    <p> Please, click the link below to reset your password</p>
-    <a href="https://_link">Reset Password</a>
+    <p> Hi _name,</p>
+    <p> You requested to reset your password.</p>
+    <p> Please, click the link below to reset your password.</p>
+    <p> Note: This link only valid upto 30m. </p>
+    <a href="_link">Click here to reset the password</a>
 </body>
 </html>
 `
