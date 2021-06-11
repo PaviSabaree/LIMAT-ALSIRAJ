@@ -14,6 +14,8 @@ class EmailService {
     sendMail(mailOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                console.info(`send email service`);
+                let emailResponse = '';
                 const transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
@@ -24,13 +26,16 @@ class EmailService {
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
                         console.error(`Email failed and the reson is :  ${error.message}`);
+                        emailResponse = `Email failed and the reson is :  ${error.message}`;
                     }
                     else {
                         console.info(`Email send successfully:  ${info}`);
                         console.debug(`Email Content`, mailOptions);
+                        emailResponse = `Email send successfully:  ${info}`;
                     }
                     return `Email sent ${info}`;
                 });
+                return emailResponse;
             }
             catch (error) {
                 throw error;

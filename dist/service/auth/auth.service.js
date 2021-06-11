@@ -14,9 +14,14 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const s3upload_1 = require("../s3upload");
 const user_schema_1 = require("../../schema/user.schema");
+const send_mail_1 = require("../send.mail");
+const request_reset_password_html_1 = require("../../templates/request-reset-password.html");
+const reset_password_html_1 = require("../../templates/reset-password.html");
+const constant_enum_1 = require("../../config/constant.enum");
 class AuthService {
     constructor() {
         this.refreshTokens = [];
+        this.mailService = new send_mail_1.default();
     }
     /* function to create new User */
     signUp(userInformation) {
@@ -186,9 +191,78 @@ class AuthService {
             });
         });
     }
+    pwdResetRequest(emailId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userInfo = yield this._checkExistinguser(emailId);
+                if (!userInfo) {
+                    throw new Error('User does not exist');
+                }
+                const tokenInfo = {
+                    emailId: userInfo.emailId,
+                    password: userInfo.password,
+                    userType: userInfo.userType,
+                };
+                const resetToken = yield this._generateAccessToken(tokenInfo);
+                const link = `${constant_enum_1.ClienUrl.clientURL}/passwordReset?token=${resetToken}&id=${userInfo._id}`;
+                let bodyContent = request_reset_password_html_1.reqResetPwd;
+                bodyContent = bodyContent.toString().replace('_name', userInfo.userName).replace('_link', link);
+                console.log(bodyContent);
+                const mailOption = {
+                    to: emailId,
+                    subject: "Password Reset Request",
+                    html: bodyContent
+                };
+                return this.mailService.sendMail(mailOption);
+            }
+            catch (err) {
+                console.log("Exception occured in pwdResetRequest", err);
+                throw err;
+            }
+        });
+    }
+    pwdReset(pwdRequest) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const isValid = yield this._verifyToken(pwdRequest.token);
+                if (!isValid) {
+                    throw new Error("Invalid or expired token");
+                }
+                const salt = yield bcrypt.genSalt(5);
+                const hashPassword = yield bcrypt.hash(pwdRequest.password, salt);
+                yield user_schema_1.UserSchema.updateOne({ _id: pwdRequest.userId }, { $set: { password: hashPassword } }, { new: true });
+                const user = yield user_schema_1.UserSchema.findById({ _id: pwdRequest.userId });
+                let bodyContent = reset_password_html_1.resetPwdSucces;
+                bodyContent = bodyContent.toString().replace('_name', user.userName);
+                const mailOption = {
+                    to: user.emailId,
+                    subject: "Password Reset Successfully",
+                    html: bodyContent
+                };
+                return yield this.mailService.sendMail(mailOption);
+            }
+            catch (error) {
+                console.log("Exception occured in pwdReset", error);
+                throw error;
+            }
+        });
+    }
+    _verifyToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let isValidToken = false;
+            jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+                if (err) {
+                    throw err;
+                }
+                isValidToken = true;
+            });
+            return isValidToken;
+        });
+    }
     _checkExistinguser(emailId) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResponse = yield user_schema_1.UserSchema.findOne({ 'emailId': emailId }).exec();
+            console.log(dbResponse);
             return dbResponse;
         });
     }

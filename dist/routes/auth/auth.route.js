@@ -82,11 +82,53 @@ class AuthRoute {
                 });
             }
         });
+        /**
+         * password reset request initiate
+         */
+        this._pwdResetRequest = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { emailId } = req.body;
+                const result = yield this.authService.pwdResetRequest(emailId);
+                if (!result && result === undefined) {
+                    throw new Error('unable to get details');
+                }
+                res.json({ data: result });
+            }
+            catch (err) {
+                console.log("Error occured in _pwdResetRequest", err);
+                res.status(400).json({
+                    message: err.toString()
+                });
+            }
+        });
+        /**
+         * password reset / update call
+         */
+        this._pwdReset = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { userId, password, token } = req.body;
+                const result = yield this.authService.pwdReset({
+                    userId, password, token
+                });
+                if (!result && result === undefined) {
+                    throw new Error('unable to get details');
+                }
+                res.json({ data: result });
+            }
+            catch (err) {
+                console.log("Error occured in _pwdReset", err);
+                res.status(400).json({
+                    message: err.toString()
+                });
+            }
+        });
         this.router.post('/masters/any/users/add', this._signup);
-        this.router.post('/masters/any/update/user', this._signup);
+        this.router.put('/masters/any/update/user', this._signup);
         this.router.post('/auth/signin', this._signIn);
         this.router.post('/auth/getAuthToken', this._getAuthToken);
         this.router.post('/auth/upload', this._upload);
+        this.router.post('/auth/password_reset', this._pwdResetRequest);
+        this.router.put('/auth/password_update', this._pwdReset);
         this.authService = new auth_service_1.default();
     }
 }

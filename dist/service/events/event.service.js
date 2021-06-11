@@ -68,26 +68,18 @@ class EventService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const events = yield events_schema_1.Events.find().exec();
-                console.log('userId', userId);
+                const newEvents = JSON.parse(JSON.stringify(events));
                 if (userId) {
                     const listAlreadyParticipated = yield participations_schema_1.Participations.find({ 'userId': userId }).populate('eventInfo').exec();
-                    console.log('listAlreadyParticipated', listAlreadyParticipated);
-                    events.forEach(element => {
+                    newEvents.forEach(element => {
                         listAlreadyParticipated.forEach(ele => {
-                            console.log('eventid', element['_id']);
-                            console.log('eventid', ele['eventId']);
-                            console.log('eventid', typeof element['_id']);
-                            console.log('eventid', typeof ele['eventId']);
                             if (ele['eventId'].toString() === element['_id'].toString()) {
-                                console.log('Matched');
                                 element.isAlreadyApplied = true;
-                                console.log('element.valeu', element);
                             }
                         });
                     });
                 }
-                console.log('events', events);
-                return events;
+                return newEvents;
             }
             catch (err) {
                 console.debug("Error occured in getEvents");

@@ -19,7 +19,7 @@ const server: express.Application = express();
 const swaggerDocument = YAML.load('docs/swagger.yaml');
 
 const app = new App({
-    port: process.env.PORT || 8000,
+    port: 8000,
     middleWares: [
 
 		bodyParser.json({ limit: '50mb' }),
