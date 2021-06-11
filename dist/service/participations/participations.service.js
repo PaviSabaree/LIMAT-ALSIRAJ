@@ -33,7 +33,8 @@ class ParticipationsService {
                         emailId: userInformation.emailId,
                         eventName: userInformation.eventName,
                         status: 'PENDING',
-                        eventInfo: userInformation.eventId
+                        eventInfo: userInformation.eventId,
+                        documentUrl: userInformation.documentUrl
                     });
                     return yield participants.save();
                 }
@@ -98,10 +99,15 @@ class ParticipationsService {
     _isUserAlreadyAppliedForevent(userId, eventId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const dbResponse = yield participations_schema_1.Participations.findOne({ 'userId': userId }).exec();
-                console.log('dbResponse ===', dbResponse, eventId, userId);
-                if (dbResponse && dbResponse['eventId'] === eventId) {
-                    return true;
+                const dbResponse = yield participations_schema_1.Participations.find({ 'userId': userId }).exec();
+                if (dbResponse.length) {
+                    const found = dbResponse.find(element => element['eventId'] === eventId);
+                    if (found) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
                 }
                 return false;
             }

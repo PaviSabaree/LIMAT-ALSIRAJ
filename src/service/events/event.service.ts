@@ -1,5 +1,6 @@
 import { IEvents } from "../../interfaces/i-event";
 import { Events } from "../../schema/events/events.schema";
+import { Participations } from "../../schema/participations/participations.schema";
 
 class EventService {
 
@@ -12,6 +13,7 @@ class EventService {
                 startDate:  eventInfo.startDate,
                 endDate:  eventInfo.endDate,
                 description:  eventInfo.description,
+                documentUrl:  eventInfo.documentUrl,
             });
 
             return await event.save();
@@ -34,6 +36,7 @@ class EventService {
                             'startDate': eventInfo.startDate,
                             'endDate': eventInfo.endDate,
                             'description':  eventInfo.description,
+                            'documentUrl': eventInfo.documentUrl
                         }
                     }
                 ).exec();        
@@ -54,10 +57,27 @@ class EventService {
         }
     }
 
-    public async getEvents():Promise<any> {
+    public async getEvents(userId):Promise<any> {
         try {
-            
-            return await Events.find().exec();
+            const events : any = await Events.find().exec();
+
+            const newEvents = JSON.parse(JSON.stringify(events))
+
+            if(userId){
+                const listAlreadyParticipated = await Participations.find({ 'userId': userId }).populate('eventInfo').exec();
+                newEvents.forEach(element => {
+
+                    listAlreadyParticipated.forEach(ele => {
+                        if(ele['eventId'].toString()=== element['_id'].toString()){
+                            element.isAlreadyApplied = true
+                        }
+                    });
+                  
+                });
+
+            }       
+
+            return newEvents
         }catch(err){
             console.debug("Error occured in getEvents");
             throw err;

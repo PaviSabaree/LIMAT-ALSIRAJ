@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const events_schema_1 = require("../../schema/events/events.schema");
+const participations_schema_1 = require("../../schema/participations/participations.schema");
 class EventService {
     addEvent(eventInfo) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -21,6 +22,7 @@ class EventService {
                     startDate: eventInfo.startDate,
                     endDate: eventInfo.endDate,
                     description: eventInfo.description,
+                    documentUrl: eventInfo.documentUrl,
                 });
                 return yield event.save();
             }
@@ -41,6 +43,7 @@ class EventService {
                         'startDate': eventInfo.startDate,
                         'endDate': eventInfo.endDate,
                         'description': eventInfo.description,
+                        'documentUrl': eventInfo.documentUrl
                     }
                 }).exec();
             }
@@ -61,10 +64,30 @@ class EventService {
             }
         });
     }
-    getEvents() {
+    getEvents(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield events_schema_1.Events.find().exec();
+                const events = yield events_schema_1.Events.find().exec();
+                console.log('userId', userId);
+                if (userId) {
+                    const listAlreadyParticipated = yield participations_schema_1.Participations.find({ 'userId': userId }).populate('eventInfo').exec();
+                    console.log('listAlreadyParticipated', listAlreadyParticipated);
+                    events.forEach(element => {
+                        listAlreadyParticipated.forEach(ele => {
+                            console.log('eventid', element['_id']);
+                            console.log('eventid', ele['eventId']);
+                            console.log('eventid', typeof element['_id']);
+                            console.log('eventid', typeof ele['eventId']);
+                            if (ele['eventId'].toString() === element['_id'].toString()) {
+                                console.log('Matched');
+                                element.isAlreadyApplied = true;
+                                console.log('element.valeu', element);
+                            }
+                        });
+                    });
+                }
+                console.log('events', events);
+                return events;
             }
             catch (err) {
                 console.debug("Error occured in getEvents");

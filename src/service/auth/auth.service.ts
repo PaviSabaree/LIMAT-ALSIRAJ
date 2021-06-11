@@ -120,9 +120,9 @@ class AuthService {
           emailId: userInformation.emailId,
           password: userInformation.password,
         }
-
-
         const userDbInfo = await UserSchema.find({'emailId': userInformation.emailId}).exec();
+
+        console.log('userDbInfo', userDbInfo)
 
         const passwordValidation = await this._isValidPassword( userDbInfo[0].password, user.password)
 

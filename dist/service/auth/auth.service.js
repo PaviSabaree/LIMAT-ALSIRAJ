@@ -105,6 +105,7 @@ class AuthService {
                     password: userInformation.password,
                 };
                 const userDbInfo = yield user_schema_1.UserSchema.find({ 'emailId': userInformation.emailId }).exec();
+                console.log('userDbInfo', userDbInfo);
                 const passwordValidation = yield this._isValidPassword(userDbInfo[0].password, user.password);
                 user.userType = userDbInfo[0]['userType'];
                 if (!passwordValidation) {

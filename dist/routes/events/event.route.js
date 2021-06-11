@@ -74,7 +74,7 @@ class EventRoutes {
         });
         this._getEvents = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const eventsResult = yield this.service.getEvents();
+                const eventsResult = yield this.service.getEvents(req.query.userId);
                 if (!eventsResult && eventsResult === undefined) {
                     throw new Error('unable to get user list');
                 }

@@ -24,6 +24,10 @@ const  EventsSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
+    },
+    documentUrl: {
+        type: String,
+        required: false
     }
 });
 

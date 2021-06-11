@@ -18,6 +18,7 @@ class ParticipationsService {
     public async applyEvent(userInformation: IApplyEvent): Promise<any> {
         try {
 
+
             const checkAlreadyApplied = await this._isUserAlreadyAppliedForevent(
                 userInformation.userId, userInformation.eventId)
 
@@ -35,7 +36,8 @@ class ParticipationsService {
                     emailId: userInformation.emailId,
                     eventName:userInformation.eventName,
                     status: 'PENDING',
-                    eventInfo:userInformation.eventId
+                    eventInfo:userInformation.eventId,
+                    documentUrl:userInformation.documentUrl
                 });
 
                 return await participants.save();
@@ -108,11 +110,19 @@ class ParticipationsService {
     private async _isUserAlreadyAppliedForevent(userId: string, eventId: string): Promise<boolean> {
         try {
 
-            const dbResponse = await Participations.findOne({ 'userId': userId }).exec();
-            console.log('dbResponse ===', dbResponse, eventId, userId)
-            if (dbResponse && dbResponse['eventId'] === eventId) {
+            const dbResponse = await Participations.find({ 'userId': userId }).exec();
+            
 
-                return true
+            if (dbResponse.length ) {
+
+                const found = dbResponse.find(element => element['eventId'] === eventId)
+
+                if(found){
+                    return true
+                }else{
+                    return false
+                }
+               
             }
 
             return false

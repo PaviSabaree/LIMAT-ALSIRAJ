@@ -619,6 +619,8 @@ definitions:
         type: string
       emailId:
         type: string
+      documentUrl:
+        type: string  
   SignUpUserInputInfo:
     type: object
     properties:
@@ -655,6 +657,8 @@ definitions:
         type: string
       description:
         type: string
+      documentUrl:
+        type: string  
   SkillInputInformation:
     type: object
     properties:

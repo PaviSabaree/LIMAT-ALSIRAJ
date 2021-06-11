@@ -89,7 +89,7 @@ class EventRoutes {
 
     private _getEvents = async (req: express.Request, res: express.Response) => {
         try {
-            const eventsResult = await this.service.getEvents();
+            const eventsResult = await this.service.getEvents(req.query.userId);
             
             if(!eventsResult && eventsResult === undefined){
                 throw new Error('unable to get user list');

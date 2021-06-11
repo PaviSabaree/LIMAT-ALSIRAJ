@@ -11,5 +11,6 @@ export interface IApplyEvent extends IMemberSkills{
     eventId : string 
     eventName: string
     status: string
+    documentUrl?: string
 }
 

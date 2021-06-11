@@ -31,6 +31,10 @@ const ParticipationsSchema = new mongoose.Schema({
     eventInfo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "EventsSchema"
+    },
+    documentUrl: {
+        type: String,
+        required: false
     }
 });
 exports.Participations = mongoose.model('Participations', ParticipationsSchema);

@@ -8,4 +8,5 @@ export interface IEvents{
     startDate: string,
     endDate: string,
     description: string,
+    documentUrl: string
 }
