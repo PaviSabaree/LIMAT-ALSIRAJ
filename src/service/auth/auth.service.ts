@@ -79,6 +79,7 @@ class AuthService {
           appUser: userInformation.appUser,
           userType: userInformation.userType,
           documentUrl: userInformation.documentUrl,
+          isPaidMember: false,
           socialAuth: userInformation.socialAuth? true : false
         });
 

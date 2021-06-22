@@ -45,6 +45,10 @@ import { IUserInformation } from "../interfaces/IUser.interface";
         type: String,
         required: false
     },
+    isPaidMember: {
+        type: Boolean,
+        required: false,
+    }
 })
 
 Users.pre<IUserInformation>('save', async function(next){
