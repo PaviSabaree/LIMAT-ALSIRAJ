@@ -2,12 +2,12 @@ import { IMemberSubscription, ISubscription } from "../../interfaces/i-subscript
 import { MemberSubscriptions } from "../../schema/member-subscription.schema";
 import { Subscriptions } from "../../schema/subscription/subscription.schema";
 import { UserSchema } from "../../schema/user.schema";
-import { PaymentService } from "../payment/payment.service"
+import PaymentService from "../payment/payment.service";
 
 class SubscriptionService {
-    public paymentService: PaymentService;
+    protected paymentService: PaymentService;
 
-    constructor(){
+    constructor() {
         this.paymentService = new PaymentService();
     }
 
@@ -78,9 +78,10 @@ class SubscriptionService {
         try {
 
             const validity = await this._processValidtity(subscriptionObj.duration);
-
-            const paymentResponse = await this.paymentService(subscriptionObj);
+            const paymentResponse = await this.paymentService.createPaymentReq(subscriptionObj);
             let membersubscription;
+
+            console.log(paymentResponse);
 
             if(paymentResponse){
 
@@ -112,36 +113,6 @@ class SubscriptionService {
             throw error;
         }
 
-    }
-
-    public async updatePaymentResponse(userId: string): Promise<any> {
-        try{
-            console.log("pop", userId);
-
-            Subscriptions.findOneAndUpdate(
-                { '_id': userId },
-                {
-                    $set: {
-                        'status': true,
-
-                    }
-                }
-            ).exec();   
-            
-            UserSchema.findOneAndUpdate(
-                { '_id': userId },
-                {
-                    $set: {
-                        'isPaidMember': true,
-
-                    }
-                }
-            ).exec(); 
-
-        }catch(err){
-            console.debug("Error occured in updatePaymentResponse");
-            throw err;
-        }
     }
 
     private async _processValidtity(duration: string): Promise<any> {
