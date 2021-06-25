@@ -1,6 +1,5 @@
 import * as express from "express";
 import PaymentService from "../../service/payment/payment.service";
-import subscriptionService from "../../service/subscription/subscription.service";
 import SubscriptionService from "../../service/subscription/subscription.service";
 
 class SubscriptionRoute {
