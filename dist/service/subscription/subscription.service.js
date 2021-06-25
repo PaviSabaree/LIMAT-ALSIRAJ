@@ -9,8 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const member_subscription_schema_1 = require("../../schema/member-subscription.schema");
 const subscription_schema_1 = require("../../schema/subscription/subscription.schema");
+const payment_service_1 = require("../payment/payment.service");
 class SubscriptionService {
+    constructor() {
+        this.paymentService = new payment_service_1.default();
+    }
     createSubscription(subscriptionObj) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -69,6 +74,53 @@ class SubscriptionService {
                 console.debug("Error occured in deleteEvent");
                 throw err;
             }
+        });
+    }
+    createMemberSubscription(subscriptionObj) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const validity = yield this._processValidtity(subscriptionObj.duration);
+                const paymentResponse = yield this.paymentService.createPaymentReq(subscriptionObj);
+                let membersubscription;
+                console.log(paymentResponse);
+                if (paymentResponse) {
+                    membersubscription = new member_subscription_schema_1.MemberSubscriptions({
+                        userId: subscriptionObj.userId,
+                        userType: subscriptionObj.userType,
+                        userEmail: subscriptionObj.userEmail,
+                        subscriptionId: subscriptionObj.subscriptionId,
+                        type: subscriptionObj.type,
+                        amount: subscriptionObj.amount,
+                        currency: subscriptionObj.currency,
+                        validTo: validity.validTo,
+                        validFrom: validity.validFrom,
+                        description: subscriptionObj.description,
+                        status: false,
+                        paymentInfo: paymentResponse
+                    });
+                    yield membersubscription.save();
+                    return paymentResponse;
+                }
+                else {
+                    return 'Error: Cannot make the payment, try after some time';
+                }
+            }
+            catch (error) {
+                console.debug("Error occured in createMemberSubscription");
+                throw error;
+            }
+        });
+    }
+    _processValidtity(duration) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const validity = duration.split(' ')[0];
+            const currentDate = new Date();
+            const currentUTC = currentDate.toUTCString();
+            const toDate = new Date(currentDate.setMonth(Number(currentDate.getMonth() + Number(validity))));
+            return {
+                validFrom: currentUTC,
+                validTo: toDate.toUTCString()
+            };
         });
     }
 }

@@ -30,6 +30,7 @@ class Service {
                     appUser: userInformation.appUser,
                     userType: userInformation.userType,
                     documentUrl: userInformation.documentUrl,
+                    isPaidMember: false
                 });
                 return yield user.save();
             }

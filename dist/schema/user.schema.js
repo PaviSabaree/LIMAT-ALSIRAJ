@@ -55,6 +55,10 @@ const Users = new mongoose.Schema({
         type: String,
         required: false
     },
+    isPaidMember: {
+        type: Boolean,
+        required: false,
+    }
 });
 Users.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {

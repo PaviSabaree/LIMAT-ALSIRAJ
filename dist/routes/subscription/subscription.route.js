@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
+const payment_service_1 = require("../../service/payment/payment.service");
 const subscription_service_1 = require("../../service/subscription/subscription.service");
 class SubscriptionRoute {
     constructor() {
@@ -86,11 +87,56 @@ class SubscriptionRoute {
                 });
             }
         });
+        this._createMemberSubscription = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const subscriptionResult = yield this.subscriptionService.createMemberSubscription(req.body);
+                if (!subscriptionResult && subscriptionResult === undefined) {
+                    throw new Error('unable to save member subscription');
+                }
+                const response = {
+                    status: 200,
+                    result: subscriptionResult,
+                    message: `Member subscription initiated sucessfully`
+                };
+                res.json({ data: response });
+            }
+            catch (error) {
+                console.log("SubscriptionRoute: Error occured in _createMemberSubscription", error);
+                res.status(400).json({
+                    message: error.toString()
+                });
+            }
+        });
+        this._confirmMemberSubscription = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const paymentId = req.query.paymentId.toString();
+                const payerId = { 'payer_id': req.query.PayerID.toString() };
+                const confirmationResult = yield this.paymentService.confirmSubscription(paymentId, payerId);
+                if (!confirmationResult && confirmationResult === undefined) {
+                    throw new Error('unable to confirm subscription');
+                }
+                const response = {
+                    status: 200,
+                    result: confirmationResult,
+                    message: `Member subscription confirmed sucessfully`
+                };
+                res.json({ data: response });
+            }
+            catch (error) {
+                console.log("SubscriptionRoute: Error occured in _confirmMemberSubscription", error);
+                res.status(400).json({
+                    message: error.toString()
+                });
+            }
+        });
         this.router.post('/subscription/create', this._createSubscription);
         this.router.get('/subscription/get', this._getSubscription);
         this.router.put('/subscription/update/:id', this._updateSubscription);
         this.router.delete('/subscription/delete/:id', this._deleteSubscription);
+        this.router.post('/subscription/member/create', this._createMemberSubscription);
+        this.router.get('/subscription/success', this._confirmMemberSubscription);
         this.subscriptionService = new subscription_service_1.default();
+        this.paymentService = new payment_service_1.default();
     }
 }
 exports.default = SubscriptionRoute;
