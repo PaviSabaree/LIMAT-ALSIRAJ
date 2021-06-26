@@ -125,8 +125,8 @@ class PaymentService {
                 "payment_method": "paypal"
             },
             "redirect_urls": {
-                "return_url": `${ClienUrl.clientURL}/subscription/success`,
-                "cancel_url": `${ClienUrl.clientURL}/cancel`
+                "return_url": `${ClienUrl.clientURL}/paymentSuccess`,
+                "cancel_url": `${ClienUrl.clientURL}/paymentError`
             },
             "transactions": [{
                 "item_list": {
