@@ -26,6 +26,8 @@ class PaymentService {
 
             return await this.createPayment(paymentReqJson).then((transaction) => {
 
+                transaction['id'] = `${transaction['id']}__userId:${paymentReq.userId}`;
+
                 const id = transaction['id']; 
                 const links = transaction['links'];
                 let counter = links.length; 
