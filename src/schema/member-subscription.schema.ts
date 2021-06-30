@@ -42,7 +42,16 @@ const  MembersubscriptionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    payId: {
+        type: String,
+        required: false
+    },
+    createdAt: {
+        type: String,
+        required: false
+    },
     paymentInfo : {
+        type: Object,
         required: false
     }
 });

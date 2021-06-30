@@ -1,4 +1,5 @@
 import * as express from "express";
+import AuthService from "../../service/auth/auth.service";
 import PaymentService from "../../service/payment/payment.service";
 import SubscriptionService from "../../service/subscription/subscription.service";
 
@@ -6,6 +7,7 @@ class SubscriptionRoute {
     protected router = express.Router();
     protected subscriptionService: SubscriptionService;
     protected paymentService: PaymentService;
+    protected authService: AuthService;
 
     constructor(){
         this.router.post('/subscription/create', this._createSubscription);
@@ -13,9 +15,12 @@ class SubscriptionRoute {
         this.router.put('/subscription/update/:id', this._updateSubscription);
         this.router.delete('/subscription/delete/:id', this._deleteSubscription);
         this.router.post('/subscription/member/create', this._createMemberSubscription);
-        this.router.get('/subscription/success', this._confirmMemberSubscription)
+        this.router.post('/subscription/success', this._confirmMemberSubscription);
+        this.router.get('/subscription/member', this._getMemberSubscription);
+        this.router.get('/subscription/member/:id', this._getMemberSubscriptionById);
         this.subscriptionService = new SubscriptionService();
         this.paymentService = new PaymentService();
+        this.authService = new AuthService();
     }
 
     private _createSubscription = async (req: express.Request, res: express.Response) => {
@@ -141,8 +146,13 @@ class SubscriptionRoute {
 
             const paymentId = req.query.paymentId.toString();
             const payerId = { 'payer_id': req.query.PayerID.toString() };
+            const userId = req.body.userId;
 
-            const confirmationResult = await this.paymentService.confirmSubscription(paymentId, payerId);
+            const confirmationResult = await this.paymentService.confirmSubscription(
+               paymentId, 
+               payerId,
+               userId
+            );
             
             if(!confirmationResult && confirmationResult === undefined){
                 throw new Error('unable to confirm subscription');
@@ -158,6 +168,44 @@ class SubscriptionRoute {
         } catch (error) {
             
             console.log("SubscriptionRoute: Error occured in _confirmMemberSubscription",error);
+
+            res.status(400).json({
+                message: error.toString()
+            }); 
+        }
+    }
+
+    private _getMemberSubscription = async (req: express.Request, res: express.Response) => {
+        try {
+            const subscriptionResult = await this.subscriptionService.getMemberSubscriptions();
+            
+            if(!subscriptionResult && subscriptionResult === undefined){
+                throw new Error('unable to get the member subscription list');
+            }
+            
+            res.json({ data :  subscriptionResult }); 
+        } catch (error) {
+            
+            console.log("SubscriptionRoute: Error occured in _getMemberSubscription",error);
+
+            res.status(400).json({
+                message: error.toString()
+            }); 
+        }
+    }
+
+    private _getMemberSubscriptionById = async (req: express.Request, res: express.Response) => {
+        try {
+            const subscriptionResult = await this.authService.getMemberSubscriptionsByUserId(req.params.id)
+            
+            if(!subscriptionResult && subscriptionResult === undefined){
+                throw new Error('unable to get the member subscription list');
+            }
+            
+            res.json({ data :  subscriptionResult }); 
+        } catch (error) {
+            
+            console.log("SubscriptionRoute: Error occured in _getMemberSubscriptionById",error);
 
             res.status(400).json({
                 message: error.toString()

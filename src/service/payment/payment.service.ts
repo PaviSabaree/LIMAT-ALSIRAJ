@@ -1,7 +1,7 @@
 import * as paypal from "paypal-rest-sdk" 
 import { ClienUrl, PaypalApi } from "../../config/constant.enum";
 import { IMemberSubscription } from "../../interfaces/i-subscription";
-import { Subscriptions } from "../../schema/subscription/subscription.schema";
+import { MemberSubscriptions } from "../../schema/member-subscription.schema";
 import { UserSchema } from "../../schema/user.schema";
 
 
@@ -17,7 +17,6 @@ class PaymentService {
 
     public async createPaymentReq(paymentReq: IMemberSubscription): Promise<any> {
         try{
-
             const paymentReqJson = this._createPaymentReq(paymentReq);
 
             console.log(JSON.stringify(paymentReqJson));
@@ -26,17 +25,17 @@ class PaymentService {
 
             return await this.createPayment(paymentReqJson).then((transaction) => {
 
-                transaction['id'] = `${transaction['id']}__userId:${paymentReq.userId}`;
-
                 const id = transaction['id']; 
                 const links = transaction['links'];
                 let counter = links.length; 
                 while( counter -- ) {
                   if ( links[counter].method == 'REDIRECT') {
                     // redirect to paypal where user approves the transaction 
-                              return links[counter].href;
+                    transaction['links'] = links[counter].href;
                     }
                 }
+
+                return transaction;
 
             }).catch((err) =>{
                 throw err;
@@ -48,28 +47,35 @@ class PaymentService {
         }
     }
 
-    public async confirmSubscription(paymentId: string, payerId: any): Promise<string> {
-        try {
-            let status = 'payment not successful';
-
+    public async confirmSubscription(paymentId: string, payerId: any, userId: string): Promise<any> {
+        try {               
             
-
-            paypal.payment.execute(paymentId, payerId, function(error, payment){
-                if(error){
-                    console.error(error);
-                } else {
-                    if (payment.state == 'approved'){ 
-
-                        const userId = paymentId.split('__userId:')[1];
-                        
-                        this._updatePaymentResponse(userId);                        
-        
-                        status = 'payment successful';
-                    } 
+            return this._executePayment(paymentId, payerId).then((transaction) => {
+                if(transaction){
+                    return this._updatePaymentResponse(userId,paymentId);
                 }
-            });
 
-            return status;
+            }).catch((err) =>{
+                throw err;
+            });
+            // paypal.payment.execute(paymentId, payerId, function(error, payment){
+            //     this._updatePaymentResponse('userId');   
+
+            //     if(error){
+            //         console.error(error);
+            //     } else {
+            //         if (payment.state == 'approved'){ 
+
+            //             const userId = paymentId.split('__userId:')[1];
+                        
+            //             this._updatePaymentResponse(userId);                        
+        
+            //             status = 'payment successful';
+            //         } 
+            //     }
+            // });
+
+            // return status;
         }catch(err){
             console.log(err);
             throw err;
@@ -87,14 +93,27 @@ class PaymentService {
           }
           }); 
       });
-      }
+    }
 
-    private async _updatePaymentResponse(userId: string): Promise<any> {
+    private async _executePayment(paymentId: string, payerId: string){
+        return new Promise( ( resolve , reject ) => {
+          paypal.payment.execute( paymentId, payerId, function( err , payment ) {
+           if ( err ) {
+               reject(err); 
+           }
+          else {
+              resolve(payment); 
+          }
+          }); 
+      });
+    }
+
+    private async _updatePaymentResponse(userId: string, payId: string): Promise<any> {
         try{
             console.log("pop", userId);
 
-            Subscriptions.findOneAndUpdate(
-                { '_id': userId },
+            const subResponse: any = await MemberSubscriptions.findOneAndUpdate(
+                { 'payId': payId },
                 {
                     $set: {
                         'status': true,
@@ -103,15 +122,23 @@ class PaymentService {
                 }
             ).exec();   
             
-            UserSchema.findOneAndUpdate(
-                { '_id': userId },
-                {
-                    $set: {
-                        'isPaidMember': true,
+            let userResponse: any = '';
 
+            if(subResponse){
+            userResponse = await UserSchema.findOneAndUpdate(
+                    { '_id': userId },
+                    {
+                        $set: {
+                            'isPaidMember': true,
+
+                        }
                     }
-                }
-            ).exec(); 
+                ).exec(); 
+            }else {
+                throw new Error('cannot confirm subscription');
+            }
+
+            return subResponse;
 
         }catch(err){
             console.debug("Error occured in updatePaymentResponse");

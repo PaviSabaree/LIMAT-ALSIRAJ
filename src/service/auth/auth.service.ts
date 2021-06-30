@@ -8,6 +8,7 @@ import EmailService from "../send.mail";
 import { reqResetPwd } from "../../templates/request-reset-password.html";
 import { resetPwdSucces } from "../../templates/reset-password.html";
 import { ClienUrl } from "../../config/constant.enum"
+import { MemberSubscriptions } from "../../schema/member-subscription.schema";
 
 class AuthService {
 
@@ -137,6 +138,7 @@ class AuthService {
 
           const token = await this._generateAccessToken(user);
           const refreshtoken = await this._generateRefreshToken(user);
+          const subscriptionInfo = await this.getMemberSubscriptionsByUserId(userDbInfo[0]._id);
 
           this.refreshTokens.push(refreshtoken);
   
@@ -149,7 +151,8 @@ class AuthService {
               refreshtoken,
             },
             userType: userDbInfo[0]['userType'],
-            userDbInfo:userDbInfo[0]
+            userDbInfo:userDbInfo[0],
+            subscriptionInfo: subscriptionInfo
           }
         }else{
 
@@ -162,6 +165,16 @@ class AuthService {
         throw err
       }
     }
+
+    public async getMemberSubscriptionsByUserId(userId: string): Promise<any> {
+      try {
+
+          return await MemberSubscriptions.findOne({'userId': userId}).exec();
+      } catch (err) {
+          console.debug("Error occured in getEvents");
+          throw err;
+      }
+  }
 
     public async getAccessToken(token: string): Promise<any> {
 

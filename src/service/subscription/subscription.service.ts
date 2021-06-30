@@ -97,12 +97,14 @@ class SubscriptionService {
                     validFrom: validity.validFrom,
                     description: subscriptionObj.description,
                     status: false,
+                    payId: paymentResponse.id,
+                    createdAt: paymentResponse.create_time,
                     paymentInfo: paymentResponse 
                 });
 
                 await membersubscription.save();
 
-                return paymentResponse;
+                return paymentResponse.links;
             }else {
                 return 'Error: Cannot make the payment, try after some time';
             }
@@ -113,6 +115,16 @@ class SubscriptionService {
             throw error;
         }
 
+    }
+
+    public async getMemberSubscriptions(): Promise<any> {
+        try {
+
+            return await MemberSubscriptions.find().exec();
+        } catch (err) {
+            console.debug("Error occured in getEvents");
+            throw err;
+        }
     }
 
     private async _processValidtity(duration: string): Promise<any> {
