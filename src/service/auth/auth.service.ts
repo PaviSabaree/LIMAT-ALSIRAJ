@@ -38,7 +38,7 @@ class AuthService {
 
 
       if(checkExistingUser){
-        if(userInformation.socialAuth && !userInformation.userType){
+        if(userInformation.socialAuth && userInformation.userType){
 
           const dbResponse = await UserSchema.findOneAndUpdate({'emailId': userInformation.emailId},
           {
