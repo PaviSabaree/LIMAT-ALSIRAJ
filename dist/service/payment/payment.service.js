@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const paypal = require("paypal-rest-sdk");
 const constant_enum_1 = require("../../config/constant.enum");
-const subscription_schema_1 = require("../../schema/subscription/subscription.schema");
+const member_subscription_schema_1 = require("../../schema/member-subscription.schema");
 const user_schema_1 = require("../../schema/user.schema");
 class PaymentService {
     constructor() {
@@ -34,9 +34,10 @@ class PaymentService {
                     while (counter--) {
                         if (links[counter].method == 'REDIRECT') {
                             // redirect to paypal where user approves the transaction 
-                            return links[counter].href;
+                            transaction['links'] = links[counter].href;
                         }
                     }
+                    return transaction;
                 }).catch((err) => {
                     throw err;
                 });
@@ -47,23 +48,29 @@ class PaymentService {
             }
         });
     }
-    confirmSubscription(paymentId, payerId) {
+    confirmSubscription(paymentId, payerId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let status = 'payment not successful';
-                paypal.payment.execute(paymentId, payerId, function (error, payment) {
-                    if (error) {
-                        console.error(error);
+                return this._executePayment(paymentId, payerId).then((transaction) => {
+                    if (transaction) {
+                        return this._updatePaymentResponse(userId, paymentId);
                     }
-                    else {
-                        if (payment.state == 'approved') {
-                            const userId = paymentId.split('__userId:')[1];
-                            this._updatePaymentResponse(userId);
-                            status = 'payment successful';
-                        }
-                    }
+                }).catch((err) => {
+                    throw err;
                 });
-                return status;
+                // paypal.payment.execute(paymentId, payerId, function(error, payment){
+                //     this._updatePaymentResponse('userId');   
+                //     if(error){
+                //         console.error(error);
+                //     } else {
+                //         if (payment.state == 'approved'){ 
+                //             const userId = paymentId.split('__userId:')[1];
+                //             this._updatePaymentResponse(userId);                        
+                //             status = 'payment successful';
+                //         } 
+                //     }
+                // });
+                // return status;
             }
             catch (err) {
                 console.log(err);
@@ -85,20 +92,41 @@ class PaymentService {
             });
         });
     }
-    _updatePaymentResponse(userId) {
+    _executePayment(paymentId, payerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                paypal.payment.execute(paymentId, payerId, function (err, payment) {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(payment);
+                    }
+                });
+            });
+        });
+    }
+    _updatePaymentResponse(userId, payId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log("pop", userId);
-                subscription_schema_1.Subscriptions.findOneAndUpdate({ '_id': userId }, {
+                const subResponse = yield member_subscription_schema_1.MemberSubscriptions.findOneAndUpdate({ 'payId': payId }, {
                     $set: {
                         'status': true,
                     }
                 }).exec();
-                user_schema_1.UserSchema.findOneAndUpdate({ '_id': userId }, {
-                    $set: {
-                        'isPaidMember': true,
-                    }
-                }).exec();
+                let userResponse = '';
+                if (subResponse) {
+                    userResponse = yield user_schema_1.UserSchema.findOneAndUpdate({ '_id': userId }, {
+                        $set: {
+                            'isPaidMember': true,
+                        }
+                    }).exec();
+                }
+                else {
+                    throw new Error('cannot confirm subscription');
+                }
+                return subResponse;
             }
             catch (err) {
                 console.debug("Error occured in updatePaymentResponse");

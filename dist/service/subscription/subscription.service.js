@@ -96,10 +96,12 @@ class SubscriptionService {
                         validFrom: validity.validFrom,
                         description: subscriptionObj.description,
                         status: false,
+                        payId: paymentResponse.id,
+                        createdAt: paymentResponse.create_time,
                         paymentInfo: paymentResponse
                     });
                     yield membersubscription.save();
-                    return paymentResponse;
+                    return paymentResponse.links;
                 }
                 else {
                     return 'Error: Cannot make the payment, try after some time';
@@ -108,6 +110,17 @@ class SubscriptionService {
             catch (error) {
                 console.debug("Error occured in createMemberSubscription");
                 throw error;
+            }
+        });
+    }
+    getMemberSubscriptions() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield member_subscription_schema_1.MemberSubscriptions.find().exec();
+            }
+            catch (err) {
+                console.debug("Error occured in getEvents");
+                throw err;
             }
         });
     }

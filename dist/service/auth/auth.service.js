@@ -18,6 +18,7 @@ const send_mail_1 = require("../send.mail");
 const request_reset_password_html_1 = require("../../templates/request-reset-password.html");
 const reset_password_html_1 = require("../../templates/reset-password.html");
 const constant_enum_1 = require("../../config/constant.enum");
+const member_subscription_schema_1 = require("../../schema/member-subscription.schema");
 class AuthService {
     constructor() {
         this.refreshTokens = [];
@@ -120,6 +121,7 @@ class AuthService {
                 if (userDbInfo.length) {
                     const token = yield this._generateAccessToken(user);
                     const refreshtoken = yield this._generateRefreshToken(user);
+                    const subscriptionInfo = yield this.getMemberSubscriptionsByUserId(userDbInfo[0]._id);
                     this.refreshTokens.push(refreshtoken);
                     return {
                         status: true,
@@ -130,7 +132,8 @@ class AuthService {
                             refreshtoken,
                         },
                         userType: userDbInfo[0]['userType'],
-                        userDbInfo: userDbInfo[0]
+                        userDbInfo: userDbInfo[0],
+                        subscriptionInfo: subscriptionInfo
                     };
                 }
                 else {
@@ -139,6 +142,17 @@ class AuthService {
             }
             catch (err) {
                 console.log("Exception occured in signIn", err);
+                throw err;
+            }
+        });
+    }
+    getMemberSubscriptionsByUserId(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield member_subscription_schema_1.MemberSubscriptions.findOne({ 'userId': userId }).exec();
+            }
+            catch (err) {
+                console.debug("Error occured in getEvents");
                 throw err;
             }
         });

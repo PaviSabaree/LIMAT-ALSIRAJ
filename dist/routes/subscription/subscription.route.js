@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
+const auth_service_1 = require("../../service/auth/auth.service");
 const payment_service_1 = require("../../service/payment/payment.service");
 const subscription_service_1 = require("../../service/subscription/subscription.service");
 class SubscriptionRoute {
@@ -111,7 +112,8 @@ class SubscriptionRoute {
             try {
                 const paymentId = req.query.paymentId.toString();
                 const payerId = { 'payer_id': req.query.PayerID.toString() };
-                const confirmationResult = yield this.paymentService.confirmSubscription(paymentId, payerId);
+                const userId = req.body.userId;
+                const confirmationResult = yield this.paymentService.confirmSubscription(paymentId, payerId, userId);
                 if (!confirmationResult && confirmationResult === undefined) {
                     throw new Error('unable to confirm subscription');
                 }
@@ -129,14 +131,47 @@ class SubscriptionRoute {
                 });
             }
         });
+        this._getMemberSubscription = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const subscriptionResult = yield this.subscriptionService.getMemberSubscriptions();
+                if (!subscriptionResult && subscriptionResult === undefined) {
+                    throw new Error('unable to get the member subscription list');
+                }
+                res.json({ data: subscriptionResult });
+            }
+            catch (error) {
+                console.log("SubscriptionRoute: Error occured in _getMemberSubscription", error);
+                res.status(400).json({
+                    message: error.toString()
+                });
+            }
+        });
+        this._getMemberSubscriptionById = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const subscriptionResult = yield this.authService.getMemberSubscriptionsByUserId(req.params.id);
+                if (!subscriptionResult && subscriptionResult === undefined) {
+                    throw new Error('unable to get the member subscription list');
+                }
+                res.json({ data: subscriptionResult });
+            }
+            catch (error) {
+                console.log("SubscriptionRoute: Error occured in _getMemberSubscriptionById", error);
+                res.status(400).json({
+                    message: error.toString()
+                });
+            }
+        });
         this.router.post('/subscription/create', this._createSubscription);
         this.router.get('/subscription/get', this._getSubscription);
         this.router.put('/subscription/update/:id', this._updateSubscription);
         this.router.delete('/subscription/delete/:id', this._deleteSubscription);
         this.router.post('/subscription/member/create', this._createMemberSubscription);
-        this.router.get('/subscription/success', this._confirmMemberSubscription);
+        this.router.post('/subscription/success', this._confirmMemberSubscription);
+        this.router.get('/subscription/member', this._getMemberSubscription);
+        this.router.get('/subscription/member/:id', this._getMemberSubscriptionById);
         this.subscriptionService = new subscription_service_1.default();
         this.paymentService = new payment_service_1.default();
+        this.authService = new auth_service_1.default();
     }
 }
 exports.default = SubscriptionRoute;
