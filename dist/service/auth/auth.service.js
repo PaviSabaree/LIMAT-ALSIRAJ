@@ -38,7 +38,7 @@ class AuthService {
                 const refreshtoken = yield this._generateRefreshToken(tokenInfo);
                 console.log('db user value ==', checkExistingUser);
                 if (checkExistingUser) {
-                    if (userInformation.socialAuth && userInformation.userType) {
+                    if (userInformation.socialAuth && !userInformation.userType) {
                         const dbResponse = yield user_schema_1.UserSchema.findOneAndUpdate({ 'emailId': userInformation.emailId }, {
                             $set: {
                                 'userType': userInformation.userType
