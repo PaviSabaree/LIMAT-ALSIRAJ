@@ -36,9 +36,16 @@ class AuthService {
 
       console.log("db user value ==", checkExistingUser);
 
+      
+
       if (checkExistingUser) {
+
+        const subscriptionInfo = await this.getMemberSubscriptionsByUserId(
+          checkExistingUser['_id']
+        );
+
         if (userInformation.socialAuth && userInformation.userType) {
-          const dbResponse = await UserSchema.findOneAndUpdate(
+           await UserSchema.findOneAndUpdate(
             { emailId: userInformation.emailId },
             {
               $set: {
@@ -48,8 +55,15 @@ class AuthService {
             }
           ).exec();
 
+         
+
+          const userDbInfo = await UserSchema.find({
+            emailId: userInformation.emailId,
+          }).exec();
+
           return {
-            checkExistingUser: dbResponse,
+            checkExistingUser: userDbInfo,
+            subscriptionInfo: subscriptionInfo,
             data: {
               status: true,
               token,
@@ -60,6 +74,7 @@ class AuthService {
         if (userInformation.socialAuth) {
           return {
             checkExistingUser,
+            subscriptionInfo: subscriptionInfo,
             data: {
               status: true,
               token,

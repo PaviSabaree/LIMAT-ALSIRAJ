@@ -38,15 +38,20 @@ class AuthService {
                 const refreshtoken = yield this._generateRefreshToken(tokenInfo);
                 console.log("db user value ==", checkExistingUser);
                 if (checkExistingUser) {
+                    const subscriptionInfo = yield this.getMemberSubscriptionsByUserId(checkExistingUser['_id']);
                     if (userInformation.socialAuth && userInformation.userType) {
-                        const dbResponse = yield user_schema_1.UserSchema.findOneAndUpdate({ emailId: userInformation.emailId }, {
+                        yield user_schema_1.UserSchema.findOneAndUpdate({ emailId: userInformation.emailId }, {
                             $set: {
                                 userType: userInformation.userType,
                                 documentUrl: userInformation.documentUrl,
                             },
                         }).exec();
+                        const userDbInfo = yield user_schema_1.UserSchema.find({
+                            emailId: userInformation.emailId,
+                        }).exec();
                         return {
-                            checkExistingUser: dbResponse,
+                            checkExistingUser: userDbInfo,
+                            subscriptionInfo: subscriptionInfo,
                             data: {
                                 status: true,
                                 token,
@@ -57,6 +62,7 @@ class AuthService {
                     if (userInformation.socialAuth) {
                         return {
                             checkExistingUser,
+                            subscriptionInfo: subscriptionInfo,
                             data: {
                                 status: true,
                                 token,
