@@ -169,7 +169,7 @@ class AuthService {
     public async getMemberSubscriptionsByUserId(userId: string): Promise<any> {
       try {
 
-          return await MemberSubscriptions.findOne({'userId': userId}).exec();
+          return await MemberSubscriptions.find({'userId': userId}).exec();
       } catch (err) {
           console.debug("Error occured in getEvents");
           throw err;

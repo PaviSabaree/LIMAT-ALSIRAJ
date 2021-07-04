@@ -149,7 +149,7 @@ class AuthService {
     getMemberSubscriptionsByUserId(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield member_subscription_schema_1.MemberSubscriptions.findOne({ 'userId': userId }).exec();
+                return yield member_subscription_schema_1.MemberSubscriptions.find({ 'userId': userId }).exec();
             }
             catch (err) {
                 console.debug("Error occured in getEvents");
