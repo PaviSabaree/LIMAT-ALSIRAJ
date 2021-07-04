@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require('dotenv').config();
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const s3upload_1 = require("../s3upload");
@@ -36,35 +36,42 @@ class AuthService {
                 };
                 const token = yield this._generateAccessToken(tokenInfo);
                 const refreshtoken = yield this._generateRefreshToken(tokenInfo);
-                console.log('db user value ==', checkExistingUser);
+                console.log("db user value ==", checkExistingUser);
                 if (checkExistingUser) {
+                    const subscriptionInfo = yield this.getMemberSubscriptionsByUserId(checkExistingUser['_id']);
                     if (userInformation.socialAuth && userInformation.userType) {
-                        const dbResponse = yield user_schema_1.UserSchema.findOneAndUpdate({ 'emailId': userInformation.emailId }, {
+                        yield user_schema_1.UserSchema.findOneAndUpdate({ emailId: userInformation.emailId }, {
                             $set: {
-                                'userType': userInformation.userType
-                            }
+                                userType: userInformation.userType,
+                                documentUrl: userInformation.documentUrl,
+                            },
+                        }).exec();
+                        const userDbInfo = yield user_schema_1.UserSchema.find({
+                            emailId: userInformation.emailId,
                         }).exec();
                         return {
-                            'checkExistingUser': dbResponse,
+                            checkExistingUser: userDbInfo,
+                            subscriptionInfo: subscriptionInfo,
                             data: {
                                 status: true,
                                 token,
                                 refreshtoken,
-                            }
+                            },
                         };
                     }
                     if (userInformation.socialAuth) {
                         return {
                             checkExistingUser,
+                            subscriptionInfo: subscriptionInfo,
                             data: {
                                 status: true,
                                 token,
                                 refreshtoken,
-                            }
+                            },
                         };
                     }
                     else {
-                        throw new Error('User Already Exist with this mail Id, Please user different user or use forget passoword');
+                        throw new Error("User Already Exist with this mail Id, Please user different user or use forget passoword");
                     }
                 }
                 else {
@@ -79,7 +86,7 @@ class AuthService {
                         userType: userInformation.userType,
                         documentUrl: userInformation.documentUrl,
                         isPaidMember: false,
-                        socialAuth: userInformation.socialAuth ? true : false
+                        socialAuth: userInformation.socialAuth ? true : false,
                     });
                     const result = yield user.save();
                     if (userInformation.socialAuth) {
@@ -89,7 +96,7 @@ class AuthService {
                                 status: true,
                                 token,
                                 refreshtoken,
-                            }
+                            },
                         };
                     }
                     else {
@@ -111,12 +118,14 @@ class AuthService {
                     emailId: userInformation.emailId,
                     password: userInformation.password,
                 };
-                const userDbInfo = yield user_schema_1.UserSchema.find({ 'emailId': userInformation.emailId }).exec();
-                console.log('userDbInfo', userDbInfo);
+                const userDbInfo = yield user_schema_1.UserSchema.find({
+                    emailId: userInformation.emailId,
+                }).exec();
+                console.log("userDbInfo", userDbInfo);
                 const passwordValidation = yield this._isValidPassword(userDbInfo[0].password, user.password);
-                user.userType = userDbInfo[0]['userType'];
+                user.userType = userDbInfo[0]["userType"];
                 if (!passwordValidation) {
-                    throw new Error('Given password is wrong please check you passwod');
+                    throw new Error("Given password is wrong please check you passwod");
                 }
                 if (userDbInfo.length) {
                     const token = yield this._generateAccessToken(user);
@@ -131,13 +140,13 @@ class AuthService {
                             token,
                             refreshtoken,
                         },
-                        userType: userDbInfo[0]['userType'],
+                        userType: userDbInfo[0]["userType"],
                         userDbInfo: userDbInfo[0],
-                        subscriptionInfo: subscriptionInfo
+                        subscriptionInfo: subscriptionInfo,
                     };
                 }
                 else {
-                    throw new Error('User Not found, Please signUp or please check your mail');
+                    throw new Error("User Not found, Please signUp or please check your mail");
                 }
             }
             catch (err) {
@@ -149,7 +158,7 @@ class AuthService {
     getMemberSubscriptionsByUserId(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield member_subscription_schema_1.MemberSubscriptions.find({ 'userId': userId }).exec();
+                return yield member_subscription_schema_1.MemberSubscriptions.find({ userId: userId }).exec();
             }
             catch (err) {
                 console.debug("Error occured in getEvents");
@@ -160,10 +169,10 @@ class AuthService {
     getAccessToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                let accessToken = '';
-                let refreshToken = '';
+                let accessToken = "";
+                let refreshToken = "";
                 if (token == null && !this.refreshTokens.includes(token)) {
-                    throw new Error('not a valid token');
+                    throw new Error("not a valid token");
                 }
                 jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => __awaiter(this, void 0, void 0, function* () {
                     if (err) {
@@ -172,12 +181,12 @@ class AuthService {
                     accessToken = yield this._generateAccessToken({
                         emailId: user.emailId,
                         password: user.password,
-                        userType: user.userType
+                        userType: user.userType,
                     });
                     refreshToken = yield this._generateRefreshToken({
                         emailId: user.emailId,
                         password: user.password,
-                        userType: user.userType
+                        userType: user.userType,
                     });
                     resolve({ accessToken, refreshToken });
                 }));
@@ -187,20 +196,30 @@ class AuthService {
     uploadFileToS3(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                var dateObj = new Date().toLocaleDateString().split('/');
-                var filename = "userupload/" + dateObj.join('') + "/" + req.files[0].originalname;
+                var dateObj = new Date().toLocaleDateString().split("/");
+                var filename = "userupload/" + dateObj.join("") + "/" + req.files[0].originalname;
                 var s3upl = s3upload_1.s3upload(filename, req);
-                s3upl.then(function (result) {
+                s3upl
+                    .then(function (result) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        if (result && result['status']) {
-                            resolve({ "status": true, "message": "succesfully uploaded", filePath: result['filePath'] });
+                        if (result && result["status"]) {
+                            resolve({
+                                status: true,
+                                message: "succesfully uploaded",
+                                filePath: result["filePath"],
+                            });
                         }
                         else {
-                            resolve({ "status": true, "message": "succesfully uploaded", filePath: "" });
+                            resolve({
+                                status: true,
+                                message: "succesfully uploaded",
+                                filePath: "",
+                            });
                         }
                     });
-                }).catch((error) => {
-                    console.log('Error while uploading the file');
+                })
+                    .catch((error) => {
+                    console.log("Error while uploading the file");
                     reject(error);
                 });
             });
@@ -211,7 +230,7 @@ class AuthService {
             try {
                 const userInfo = yield this._checkExistinguser(emailId);
                 if (!userInfo) {
-                    throw new Error('User does not exist');
+                    throw new Error("User does not exist");
                 }
                 const tokenInfo = {
                     emailId: userInfo.emailId,
@@ -221,12 +240,15 @@ class AuthService {
                 const resetToken = yield this._generateAccessToken(tokenInfo);
                 const link = `${constant_enum_1.ClienUrl.clientURL}/passwordReset?token=${resetToken}&id=${userInfo._id}`;
                 let bodyContent = request_reset_password_html_1.reqResetPwd;
-                bodyContent = bodyContent.toString().replace('_name', userInfo.userName).replace('_link', link);
+                bodyContent = bodyContent
+                    .toString()
+                    .replace("_name", userInfo.userName)
+                    .replace("_link", link);
                 console.log(bodyContent);
                 const mailOption = {
                     to: emailId,
                     subject: "Password Reset Request",
-                    html: bodyContent
+                    html: bodyContent,
                 };
                 return this.mailService.sendMail(mailOption);
             }
@@ -248,11 +270,11 @@ class AuthService {
                 yield user_schema_1.UserSchema.updateOne({ _id: pwdRequest.userId }, { $set: { password: hashPassword } }, { new: true });
                 const user = yield user_schema_1.UserSchema.findById({ _id: pwdRequest.userId });
                 let bodyContent = reset_password_html_1.resetPwdSucces;
-                bodyContent = bodyContent.toString().replace('_name', user.userName);
+                bodyContent = bodyContent.toString().replace("_name", user.userName);
                 const mailOption = {
                     to: user.emailId,
                     subject: "Password Reset Successfully",
-                    html: bodyContent
+                    html: bodyContent,
                 };
                 return yield this.mailService.sendMail(mailOption);
             }
@@ -276,20 +298,24 @@ class AuthService {
     }
     _checkExistinguser(emailId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dbResponse = yield user_schema_1.UserSchema.findOne({ 'emailId': emailId }).exec();
+            const dbResponse = yield user_schema_1.UserSchema.findOne({ emailId: emailId }).exec();
             console.log(dbResponse);
             return dbResponse;
         });
     }
     _generateAccessToken(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('qq', user);
-            return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
+            console.log("qq", user);
+            return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: "30m",
+            });
         });
     }
     _generateRefreshToken(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30m' });
+            return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+                expiresIn: "30m",
+            });
         });
     }
     _isValidPassword(hashPassword, inputPassword) {
