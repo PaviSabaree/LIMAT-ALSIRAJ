@@ -90,7 +90,7 @@ class EventRoutes {
         this.router.post('/masters/any/competition/add', authentication_1.default, this._addEvent);
         this.router.put('/masters/any/competition/edit/:id', authentication_1.default, this._editEvent);
         this.router.delete('/masters/any/competition/delete/:id', authentication_1.default, this._deleteEvent);
-        this.router.get('/masters/any/competition/list', this._getEvents);
+        this.router.get('/masters/any/competition/list', authentication_1.default, this._getEvents);
         this.service = new event_service_1.default();
     }
 }
